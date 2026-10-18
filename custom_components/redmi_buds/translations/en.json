@@ -1,0 +1,240 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Choose the earbuds",
+        "description": "Devices already paired with Home Assistant local Bluetooth. Choose your Redmi Buds 6 Play, open the case and wake them. Temporarily disconnect the phone. The model will be verified after you submit. Select manual entry if needed.",
+        "data": {
+          "device": "Paired device",
+          "manual_entry": "Enter an address manually"
+        }
+      },
+      "reconfigure": {
+        "title": "Redmi Buds 6 Play",
+        "description": "Change the RFCOMM channel for this device. Validation opens a connection.",
+        "data": {
+          "address": "Bluetooth address (MAC)",
+          "channel": "RFCOMM channel"
+        }
+      },
+      "manual": {
+        "title": "Manual connection",
+        "description": "Pair the earbuds with Home Assistant Bluetooth first. Open the case, wake the earbuds and temporarily turn off phone Bluetooth. Validation briefly opens an RFCOMM connection. Refreshing is manual by default.",
+        "data": {
+          "address": "Bluetooth address (MAC)",
+          "channel": "RFCOMM channel"
+        }
+      }
+    },
+    "error": {
+      "invalid_address": "Enter a valid MAC address.",
+      "different_device": "Add a new integration for a different MAC address.",
+      "cannot_connect": "Cannot connect. Check pairing, the open case, local Bluetooth and the phone connection.",
+      "unsupported_device": "Only Redmi Buds 6 Play are supported.",
+      "unsupported_transport": "This Python platform does not provide Bluetooth classic RFCOMM sockets.",
+      "cannot_list_devices": "The local Bluetooth list is unavailable. You can enter the address manually. Check that the earbuds are paired with the local controller.",
+      "select_device": "Choose a device or select manual entry."
+    },
+    "abort": {
+      "already_configured": "This device is already configured.",
+      "reconfigure_successful": "Configuration updated."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Refreshing",
+        "description": "Choose 0 for manual refresh or an interval of 5–1440 minutes. Reads may interfere with the phone connection. Check the last successful read timestamp to see how recent the values are.",
+        "data": {
+          "poll_interval_minutes": "Interval in minutes (0 = manual)"
+        }
+      }
+    },
+    "error": {
+      "invalid_interval": "Choose 0 for manual mode or a whole number from 5 to 1440 minutes."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "battery_left": {
+        "name": "Left battery level"
+      },
+      "battery_right": {
+        "name": "Right battery level"
+      },
+      "battery_case": {
+        "name": "Case battery level"
+      },
+      "last_read": {
+        "name": "Last successful read"
+      },
+      "firmware_raw": {
+        "name": "Firmware version"
+      },
+      "serial_number": {
+        "name": "Serial number"
+      },
+      "gesture_long_left": {
+        "name": "Press and hold left earphone",
+        "state": {
+          "voice_assistant": "Voice assistant",
+          "play_pause": "Play/Pause",
+          "previous_track": "Previous song",
+          "next_track": "Next song",
+          "volume_up": "Volume up",
+          "volume_down": "Volume down",
+          "none": "None",
+          "take_photo": "Take photo",
+          "unrecognized": "Unrecognized"
+        }
+      },
+      "gesture_long_right": {
+        "name": "Press and hold right earphone",
+        "state": {
+          "voice_assistant": "Voice assistant",
+          "play_pause": "Play/Pause",
+          "previous_track": "Previous song",
+          "next_track": "Next song",
+          "volume_up": "Volume up",
+          "volume_down": "Volume down",
+          "none": "None",
+          "take_photo": "Take photo",
+          "unrecognized": "Unrecognized"
+        }
+      }
+    },
+    "binary_sensor": {
+      "charging_left": {
+        "name": "Left charging"
+      },
+      "charging_right": {
+        "name": "Right charging"
+      },
+      "charging_case": {
+        "name": "Case charging"
+      }
+    },
+    "switch": {
+      "low_latency": {
+        "name": "Low latency"
+      }
+    },
+    "select": {
+      "equalizer": {
+        "name": "Audio balance",
+        "state": {
+          "balanced": "Balanced sound",
+          "voice": "Enhance Voice",
+          "bass": "Enhance Bass",
+          "treble": "Enhance Treble",
+          "volume": "Boost Volume"
+        }
+      },
+      "gesture_single_left": {
+        "name": "Tap left earphone once",
+        "state": {
+          "voice_assistant": "Voice assistant",
+          "play_pause": "Play/Pause",
+          "previous_track": "Previous song",
+          "next_track": "Next song",
+          "volume_up": "Volume up",
+          "volume_down": "Volume down",
+          "none": "None",
+          "take_photo": "Take photo",
+          "unrecognized": "Unrecognized"
+        }
+      },
+      "gesture_single_right": {
+        "name": "Tap right earphone once",
+        "state": {
+          "voice_assistant": "Voice assistant",
+          "play_pause": "Play/Pause",
+          "previous_track": "Previous song",
+          "next_track": "Next song",
+          "volume_up": "Volume up",
+          "volume_down": "Volume down",
+          "none": "None",
+          "take_photo": "Take photo",
+          "unrecognized": "Unrecognized"
+        }
+      },
+      "gesture_double_left": {
+        "name": "Double tap left earphone",
+        "state": {
+          "voice_assistant": "Voice assistant",
+          "play_pause": "Play/Pause",
+          "previous_track": "Previous song",
+          "next_track": "Next song",
+          "volume_up": "Volume up",
+          "volume_down": "Volume down",
+          "none": "None",
+          "take_photo": "Take photo",
+          "unrecognized": "Unrecognized"
+        }
+      },
+      "gesture_double_right": {
+        "name": "Double tap right earphone",
+        "state": {
+          "voice_assistant": "Voice assistant",
+          "play_pause": "Play/Pause",
+          "previous_track": "Previous song",
+          "next_track": "Next song",
+          "volume_up": "Volume up",
+          "volume_down": "Volume down",
+          "none": "None",
+          "take_photo": "Take photo",
+          "unrecognized": "Unrecognized"
+        }
+      },
+      "gesture_triple_left": {
+        "name": "Triple tap left earphone",
+        "state": {
+          "voice_assistant": "Voice assistant",
+          "play_pause": "Play/Pause",
+          "previous_track": "Previous song",
+          "next_track": "Next song",
+          "volume_up": "Volume up",
+          "volume_down": "Volume down",
+          "none": "None",
+          "take_photo": "Take photo",
+          "unrecognized": "Unrecognized"
+        }
+      },
+      "gesture_triple_right": {
+        "name": "Triple tap right earphone",
+        "state": {
+          "voice_assistant": "Voice assistant",
+          "play_pause": "Play/Pause",
+          "previous_track": "Previous song",
+          "next_track": "Next song",
+          "volume_up": "Volume up",
+          "volume_down": "Volume down",
+          "none": "None",
+          "take_photo": "Take photo",
+          "unrecognized": "Unrecognized"
+        }
+      },
+      "gesture_long_left": {
+        "name": "Press and hold left earphone",
+        "state": {
+          "none": "None",
+          "voice_assistant": "Voice assistant",
+          "take_photo": "Take photo"
+        }
+      },
+      "gesture_long_right": {
+        "name": "Press and hold right earphone",
+        "state": {
+          "none": "None",
+          "voice_assistant": "Voice assistant",
+          "take_photo": "Take photo"
+        }
+      }
+    },
+    "button": {
+      "refresh": {
+        "name": "Refresh"
+      }
+    }
+  }
+}

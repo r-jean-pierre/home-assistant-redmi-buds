@@ -1,0 +1,240 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Choisir les écouteurs",
+        "description": "Appareils déjà appairés au Bluetooth local de Home Assistant. Choisissez vos Redmi Buds 6 Play, ouvrez le boîtier et réveillez-les. Déconnectez temporairement le téléphone. Le modèle sera vérifié après validation. Si nécessaire, cochez la saisie manuelle.",
+        "data": {
+          "device": "Appareil appairé",
+          "manual_entry": "Saisir une adresse manuellement"
+        }
+      },
+      "reconfigure": {
+        "title": "Redmi Buds 6 Play",
+        "description": "Modifiez le canal RFCOMM de cet appareil. La validation ouvre une connexion.",
+        "data": {
+          "address": "Adresse Bluetooth (MAC)",
+          "channel": "Canal RFCOMM"
+        }
+      },
+      "manual": {
+        "title": "Connexion manuelle",
+        "description": "Appairez les écouteurs au Bluetooth de Home Assistant avant de continuer. Ouvrez le boîtier, réveillez les écouteurs et coupez temporairement le Bluetooth du téléphone. La validation ouvre brièvement une connexion RFCOMM. L’actualisation sera manuelle par défaut.",
+        "data": {
+          "address": "Adresse Bluetooth (MAC)",
+          "channel": "Canal RFCOMM"
+        }
+      }
+    },
+    "error": {
+      "invalid_address": "Saisissez une adresse MAC valide.",
+      "different_device": "Pour une autre adresse MAC, ajoutez une nouvelle intégration.",
+      "cannot_connect": "Connexion impossible. Vérifiez l’appairage, le boîtier ouvert, le Bluetooth local et la connexion du téléphone.",
+      "unsupported_device": "Seuls les Redmi Buds 6 Play sont pris en charge.",
+      "unsupported_transport": "Cette plateforme Python ne fournit pas de socket Bluetooth classique RFCOMM.",
+      "cannot_list_devices": "La liste Bluetooth locale est inaccessible. Vous pouvez saisir l’adresse manuellement. Vérifiez que les écouteurs sont appairés au contrôleur local.",
+      "select_device": "Choisissez un appareil ou cochez la saisie manuelle."
+    },
+    "abort": {
+      "already_configured": "Cet appareil est déjà configuré.",
+      "reconfigure_successful": "Configuration mise à jour."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Actualisation",
+        "description": "Choisissez 0 pour une actualisation manuelle ou un intervalle de 5 à 1440 minutes. Les lectures peuvent gêner la connexion du téléphone. Consultez la date de dernière lecture réussie pour connaître l’ancienneté des valeurs.",
+        "data": {
+          "poll_interval_minutes": "Intervalle en minutes (0 = manuel)"
+        }
+      }
+    },
+    "error": {
+      "invalid_interval": "Choisissez 0 pour le mode manuel ou un nombre entier de 5 à 1440 minutes."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "battery_left": {
+        "name": "Batterie gauche"
+      },
+      "battery_right": {
+        "name": "Batterie droite"
+      },
+      "battery_case": {
+        "name": "Batterie du boîtier"
+      },
+      "last_read": {
+        "name": "Dernière lecture réussie"
+      },
+      "firmware_raw": {
+        "name": "Firmware"
+      },
+      "serial_number": {
+        "name": "Numéro de série"
+      },
+      "gesture_long_left": {
+        "name": "Appui long gauche",
+        "state": {
+          "voice_assistant": "Assistant vocal",
+          "play_pause": "Lecture/pause",
+          "previous_track": "Piste précédente",
+          "next_track": "Piste suivante",
+          "volume_up": "Volume +",
+          "volume_down": "Volume −",
+          "none": "Aucune action",
+          "take_photo": "Prendre une photo",
+          "unrecognized": "Non reconnu"
+        }
+      },
+      "gesture_long_right": {
+        "name": "Appui long droit",
+        "state": {
+          "voice_assistant": "Assistant vocal",
+          "play_pause": "Lecture/pause",
+          "previous_track": "Piste précédente",
+          "next_track": "Piste suivante",
+          "volume_up": "Volume +",
+          "volume_down": "Volume −",
+          "none": "Aucune action",
+          "take_photo": "Prendre une photo",
+          "unrecognized": "Non reconnu"
+        }
+      }
+    },
+    "binary_sensor": {
+      "charging_left": {
+        "name": "Charge gauche"
+      },
+      "charging_right": {
+        "name": "Charge droite"
+      },
+      "charging_case": {
+        "name": "Charge du boîtier"
+      }
+    },
+    "switch": {
+      "low_latency": {
+        "name": "Faible latence"
+      }
+    },
+    "select": {
+      "equalizer": {
+        "name": "Égaliseur",
+        "state": {
+          "balanced": "Son équilibré",
+          "voice": "Voix renforcées",
+          "bass": "Basses renforcées",
+          "treble": "Aigus renforcés",
+          "volume": "Volume renforcé"
+        }
+      },
+      "gesture_single_left": {
+        "name": "Appui simple gauche",
+        "state": {
+          "voice_assistant": "Assistant vocal",
+          "play_pause": "Lecture/pause",
+          "previous_track": "Piste précédente",
+          "next_track": "Piste suivante",
+          "volume_up": "Volume +",
+          "volume_down": "Volume −",
+          "none": "Aucune action",
+          "take_photo": "Prendre une photo",
+          "unrecognized": "Non reconnu"
+        }
+      },
+      "gesture_single_right": {
+        "name": "Appui simple droit",
+        "state": {
+          "voice_assistant": "Assistant vocal",
+          "play_pause": "Lecture/pause",
+          "previous_track": "Piste précédente",
+          "next_track": "Piste suivante",
+          "volume_up": "Volume +",
+          "volume_down": "Volume −",
+          "none": "Aucune action",
+          "take_photo": "Prendre une photo",
+          "unrecognized": "Non reconnu"
+        }
+      },
+      "gesture_double_left": {
+        "name": "Double appui gauche",
+        "state": {
+          "voice_assistant": "Assistant vocal",
+          "play_pause": "Lecture/pause",
+          "previous_track": "Piste précédente",
+          "next_track": "Piste suivante",
+          "volume_up": "Volume +",
+          "volume_down": "Volume −",
+          "none": "Aucune action",
+          "take_photo": "Prendre une photo",
+          "unrecognized": "Non reconnu"
+        }
+      },
+      "gesture_double_right": {
+        "name": "Double appui droit",
+        "state": {
+          "voice_assistant": "Assistant vocal",
+          "play_pause": "Lecture/pause",
+          "previous_track": "Piste précédente",
+          "next_track": "Piste suivante",
+          "volume_up": "Volume +",
+          "volume_down": "Volume −",
+          "none": "Aucune action",
+          "take_photo": "Prendre une photo",
+          "unrecognized": "Non reconnu"
+        }
+      },
+      "gesture_triple_left": {
+        "name": "Triple appui gauche",
+        "state": {
+          "voice_assistant": "Assistant vocal",
+          "play_pause": "Lecture/pause",
+          "previous_track": "Piste précédente",
+          "next_track": "Piste suivante",
+          "volume_up": "Volume +",
+          "volume_down": "Volume −",
+          "none": "Aucune action",
+          "take_photo": "Prendre une photo",
+          "unrecognized": "Non reconnu"
+        }
+      },
+      "gesture_triple_right": {
+        "name": "Triple appui droit",
+        "state": {
+          "voice_assistant": "Assistant vocal",
+          "play_pause": "Lecture/pause",
+          "previous_track": "Piste précédente",
+          "next_track": "Piste suivante",
+          "volume_up": "Volume +",
+          "volume_down": "Volume −",
+          "none": "Aucune action",
+          "take_photo": "Prendre une photo",
+          "unrecognized": "Non reconnu"
+        }
+      },
+      "gesture_long_left": {
+        "name": "Appui long gauche",
+        "state": {
+          "none": "Aucune action",
+          "voice_assistant": "Assistant vocal",
+          "take_photo": "Prendre une photo"
+        }
+      },
+      "gesture_long_right": {
+        "name": "Appui long droit",
+        "state": {
+          "none": "Aucune action",
+          "voice_assistant": "Assistant vocal",
+          "take_photo": "Prendre une photo"
+        }
+      }
+    },
+    "button": {
+      "refresh": {
+        "name": "Actualiser"
+      }
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "domain": "redmi_buds",
+  "name": "Redmi Buds 6 Play",
+  "codeowners": [
+    "@r-jean-pierre"
+  ],
+  "config_flow": true,
+  "documentation": "https://github.com/r-jean-pierre/home-assistant-redmi-buds",
+  "integration_type": "device",
+  "iot_class": "local_polling",
+  "requirements": [],
+  "version": "0.1.10",
+  "dependencies": [
+    "bluetooth"
+  ]
+}
