@@ -1,10 +1,10 @@
 # Changelog
 
-## À publier — Première version
+## Unreleased — Initial release
 
-- Configuration depuis l’interface Home Assistant avec sélection des écouteurs appairés.
-- Niveaux de batterie et états de charge des écouteurs et du boîtier.
-- Réglages de faible latence, de profils audio et des gestes de chaque écouteur.
-- Actualisation manuelle ou périodique et horodatage de la dernière lecture réussie.
-- Informations de firmware, de modèle et de numéro de série.
-- Traductions en français et en anglais, diagnostics et tests automatisés.
+- UI setup with paired-device selection and manual address entry.
+- Battery levels and charging status for both earphones and the case.
+- Low latency, audio balance and individual gesture settings.
+- Manual or periodic refresh with the last successful read timestamp.
+- Firmware version, model reference and serial number.
+- English and French translations, diagnostics and automated tests.

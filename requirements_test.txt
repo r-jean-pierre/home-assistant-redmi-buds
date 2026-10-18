@@ -1,3 +1,5 @@
 # Test environment (Python 3.14).
 homeassistant==2026.10.2
 pytest-homeassistant-custom-component==0.13.373
+pytest-cov==7.1.0
+ruff==0.17.1

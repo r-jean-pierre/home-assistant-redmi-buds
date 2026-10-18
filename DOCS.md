@@ -1,20 +1,21 @@
-# Utilisation et dépannage
+# Usage and troubleshooting
 
-## Appairer les écouteurs
+## Pair the earphones
 
-Les écouteurs doivent être appairés au contrôleur Bluetooth local de Home
-Assistant avant l’ajout de l’intégration. Un appairage avec le téléphone seul
-ne suffit pas. Si les écouteurs sont déjà appairés à Home Assistant, conserver
-cet appairage.
+Pair the earphones with Home Assistant’s local Bluetooth controller before
+adding the integration. Pairing them with a phone alone is not sufficient.
+Keep an existing Home Assistant pairing.
 
-Si votre installation donne accès à `bluetoothctl`, lancer :
+If your installation provides `bluetoothctl`, run it from a terminal with
+access to that controller:
 
 ```bash
 bluetoothctl
 ```
 
-Dans l’invite interactive, rechercher les écouteurs, puis remplacer
-`AA:BB:CC:DD:EE:01` par leur adresse :
+Open the case and put the earphones into pairing mode according to their
+manual. In the interactive prompt, scan for the device and replace the example
+address below with its Bluetooth address:
 
 ```text
 power on
@@ -27,97 +28,95 @@ scan off
 quit
 ```
 
-Le terminal utilisé doit avoir accès au contrôleur Bluetooth de Home Assistant.
-Ouvrir le boîtier et placer les écouteurs en mode appairage selon leur notice.
+## Add the integration
 
-## Ajouter l’intégration
+Go to **Settings → Devices & services → Add integration → Redmi Buds 6 Play**.
+Choose the earphones from the paired devices list. Reopen the form after a
+new pairing to refresh the list.
 
-Dans **Paramètres → Appareils et services → Ajouter une intégration**,
-rechercher **Redmi Buds 6 Play**, puis choisir les écouteurs par leur nom.
-Après un nouvel appairage, rouvrir le formulaire pour actualiser la liste.
+Manual address entry is available if the list is empty or unavailable.
+The default RFCOMM channel is **6**. The integration checks the product
+identifier when connecting; a matching Bluetooth name alone is not sufficient.
 
-Si la liste est vide ou inaccessible, utiliser la saisie manuelle de l’adresse
-Bluetooth. Le canal par défaut est **6**. Le nom affiché ne suffit pas à
-identifier un modèle compatible : l’intégration vérifie l’appareil à la connexion.
+## Read measurements
 
-## Consulter les mesures
+Press **Refresh** on the device page to read batteries, charging status and
+settings. Battery levels are percentages; charging entities are on/off indicators.
+Their icons distinguish charging, not charging and unknown states.
 
-Appuyer sur **Actualiser** sur la fiche appareil pour lire les batteries,
-la charge et les réglages. Les niveaux de batterie sont exprimés en pourcentage ;
-les états de charge indiquent si l’élément est en charge.
+Values reflect the last read. A failed read makes measurements unavailable
+while retaining **Last successful read**. Wake the earphones and refresh again.
+Manual mode does not restore measurements after a Home Assistant restart.
 
-Les valeurs restent celles de la dernière lecture. Si une lecture échoue,
-les mesures deviennent indisponibles et la date de dernière lecture réussie
-reste visible. Réveiller les écouteurs, puis actualiser de nouveau.
+**Firmware version** and **Serial number** sensors are disabled by default.
+Enable them in the device’s entity list if needed. Unrecognized firmware
+signatures are displayed as raw bytes.
 
-Les capteurs **Firmware version** et **Serial number** sont désactivés par
-défaut. Ils peuvent être activés depuis la liste des entités de l’appareil.
-Une version de firmware non reconnue s’affiche sous sa forme brute.
+## Automatic refresh
 
-## Régler l’actualisation automatique
+Open the integration options from **Settings → Devices & services**.
 
-Ouvrir les options de l’intégration depuis **Paramètres → Appareils et services**.
-
-| Valeur | Fonctionnement |
+| Interval | Behavior |
 | --- | --- |
-| `0` | Actualisation manuelle |
-| `5` à `1440` | Intervalle en minutes |
+| `0` | Manual refresh |
+| `5`–`1440` | Refresh interval in minutes |
 
-L’activation d’un intervalle déclenche une lecture. En mode manuel, aucune
-lecture automatique n’est effectuée au démarrage : utiliser **Actualiser**.
-Une interrogation peut perturber la connexion du téléphone.
+Enabling an interval starts a read. In manual mode, use **Refresh** after
+startup. Reads can interfere with the phone’s Bluetooth connection.
 
-## Modifier les réglages
+## Gesture settings
 
-Les sélecteurs de la section **Configuration** permettent de modifier les gestes.
-Les libellés anglais correspondent à ceux de l’application Xiaomi Earbuds.
+Use the selects in the device’s **Configuration** section.
 
-| Geste | Gauche | Droite |
+| Gesture | Left | Right |
 | --- | --- | --- |
-| Simple | Tap left earphone once | Tap right earphone once |
+| Single | Tap left earphone once | Tap right earphone once |
 | Double | Double tap left earphone | Double tap right earphone |
 | Triple | Triple tap left earphone | Triple tap right earphone |
-| Long | Press and hold left earphone | Press and hold right earphone |
+| Hold | Press and hold left earphone | Press and hold right earphone |
 
-Les appuis simples, doubles et triples proposent **None**, **Play/Pause**,
-**Volume up**, **Volume down**, **Previous song**, **Next song** et **Take photo**.
-Les appuis longs proposent **None**, **Voice assistant** et **Take photo**.
-Les capteurs d’appui long dans **Diagnostic** affichent uniquement l’état ;
-utiliser les sélecteurs de **Configuration** pour le modifier.
+Single, double and triple taps offer **None**, **Play/Pause**, **Volume up**,
+**Volume down**, **Previous song**, **Next song** and **Take photo**.
+Press and hold offers **None**, **Voice assistant** and **Take photo**.
+The long-press sensors under **Diagnostic** are read-only; use the
+configuration selects to change their values.
 
-**Audio balance** propose Balanced sound, Enhance Voice, Enhance Bass,
-Enhance Treble et Boost Volume. **Low latency** active ou désactive la faible latence.
+After a change, the integration reads all settings again. Some actions,
+particularly **Take photo**, may also affect another gesture. According to
+Xiaomi Earbuds, the photo feature requires a compatible Xiaomi HyperOS phone
+and is unavailable with dual connection.
 
-Après une modification, l’intégration relit les réglages. Certaines actions,
-notamment **Take photo**, peuvent également modifier un autre geste.
-La fonction photo nécessite un téléphone compatible Xiaomi HyperOS et n’est
-pas disponible en double connexion, selon l’application Xiaomi Earbuds.
+If a write returns an error, **refresh before trying again**. The setting
+may have changed even if its confirmation was not received.
 
-Si une erreur survient après une modification, **actualiser avant de réessayer** :
-le réglage peut avoir été appliqué malgré une confirmation manquante.
+## Audio settings
 
-## Résoudre un problème de connexion
+**Audio balance** offers Balanced sound, Enhance Voice, Enhance Bass,
+Enhance Treble and Boost Volume. **Low latency** turns low latency on or off.
+The integration displays the settings read back from the earphones.
 
-- Vérifier que l’adaptateur Bluetooth classique local est accessible à Home Assistant.
-- Ouvrir le boîtier, réveiller les écouteurs et les rapprocher de l’adaptateur.
-- Déconnecter temporairement le téléphone et fermer les autres applications utilisant les écouteurs.
-- Vérifier l’appairage au contrôleur de Home Assistant, puis actualiser.
+## Connection problems
 
-Si le téléphone ne reprend pas l’audio, déconnecter les écouteurs du contrôleur
-Home Assistant. Depuis un terminal ayant accès à ce contrôleur :
+- Check that Home Assistant can access a local Bluetooth classic adapter.
+- Open the case, wake the earphones and move them closer to the adapter.
+- Temporarily disconnect the phone and close other earphone clients.
+- Check pairing with Home Assistant’s controller, then refresh.
+
+If the phone cannot resume audio, disconnect the earphones from Home
+Assistant’s controller using a terminal with access to it:
 
 ```bash
 bluetoothctl disconnect AA:BB:CC:DD:EE:01
 ```
 
-Remplacer l’adresse par celle des écouteurs. Cette commande coupe leurs
-connexions sur ce contrôleur sans supprimer l’appairage. L’intégration ne
-l’exécute pas automatiquement. Privilégier le mode manuel si les lectures
-périodiques gênent l’usage audio.
+Replace the example address. This disconnects the device’s profiles on that
+controller without removing the pairing. The integration does not run this
+command automatically. Use manual refresh if polling disrupts audio.
 
-## Signaler un problème
+## Report a problem
 
-Indiquer la version de Home Assistant, le type d’installation, l’adaptateur
-Bluetooth, le message d’erreur et les étapes permettant de reproduire le problème.
-Les diagnostics téléchargeables de l’intégration excluent l’adresse Bluetooth
-et le numéro de série. Vérifier les autres journaux et captures avant de les publier.
+Use the repository’s bug report form. Include Home Assistant and integration
+versions, installation type, Bluetooth adapter, the error message and steps
+to reproduce the problem. Integration diagnostics omit Bluetooth addresses and
+serial numbers. Review other logs and screenshots before sharing them.
+For vulnerabilities, follow [SECURITY.md](SECURITY.md).

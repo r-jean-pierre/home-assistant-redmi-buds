@@ -5,12 +5,13 @@
     "@r-jean-pierre"
   ],
   "config_flow": true,
+  "dependencies": [
+    "bluetooth"
+  ],
   "documentation": "https://github.com/r-jean-pierre/home-assistant-redmi-buds",
   "integration_type": "device",
   "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/r-jean-pierre/home-assistant-redmi-buds/issues",
   "requirements": [],
-  "version": "0.1.10",
-  "dependencies": [
-    "bluetooth"
-  ]
+  "version": "0.1.0"
 }

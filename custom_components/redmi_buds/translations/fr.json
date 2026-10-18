@@ -57,19 +57,19 @@
   "entity": {
     "sensor": {
       "battery_left": {
-        "name": "Batterie gauche"
+        "name": "Niveau de batterie gauche"
       },
       "battery_right": {
-        "name": "Batterie droite"
+        "name": "Niveau de batterie droite"
       },
       "battery_case": {
-        "name": "Batterie du boîtier"
+        "name": "Niveau de batterie du boîtier"
       },
       "last_read": {
         "name": "Dernière lecture réussie"
       },
       "firmware_raw": {
-        "name": "Firmware"
+        "name": "Version du firmware"
       },
       "serial_number": {
         "name": "Numéro de série"
@@ -121,7 +121,7 @@
     },
     "select": {
       "equalizer": {
-        "name": "Égaliseur",
+        "name": "Équilibre audio",
         "state": {
           "balanced": "Son équilibré",
           "voice": "Voix renforcées",

@@ -1,69 +1,80 @@
-# Redmi Buds 6 Play pour Home Assistant
+# Redmi Buds 6 Play for Home Assistant
 
 ![Redmi Buds 6 Play](custom_components/redmi_buds/brand/icon.png)
 
-Intégration personnalisée pour consulter la batterie et configurer les
-**Redmi Buds 6 Play** depuis Home Assistant. Connexion Bluetooth directe,
-configuration dans l’interface et traductions en français et en anglais.
+Custom integration to monitor batteries and configure **Redmi Buds 6 Play**
+from Home Assistant. Direct Bluetooth connection, UI setup, and English and
+French translations.
 
-[English](README.en.md) · [Guide d’utilisation](DOCS.md)
+[Français](README.fr.md) · [User guide](DOCS.md)
 
-## Fonctionnalités
+## Features
 
-- Niveau de batterie et état de charge de chaque écouteur et du boîtier.
-- Réglage de la faible latence et des cinq profils audio.
-- Configuration des appuis simples, doubles, triples et longs, à gauche et à droite.
-- Actualisation manuelle ou périodique et date de dernière lecture réussie.
-- Version du firmware, référence du modèle et numéro de série.
+- Battery levels and charging status for both earphones and the case.
+- Low latency control and five audio profiles.
+- Single, double, triple, and press-and-hold gesture settings for each earphone.
+- Manual or periodic refresh and last successful read timestamp.
+- Firmware version, model reference, and serial number.
 
-Les réglages de gestes modifient les actions des écouteurs. Ils ne génèrent
-pas d’événements d’appui utilisables dans les automatisations Home Assistant.
+Gesture settings configure the earphones’ actions. They do not produce
+physical tap events for Home Assistant automations.
 
-## Prérequis
+## Requirements
 
-- Home Assistant sous Linux, avec un adaptateur Bluetooth classique local accessible à Core.
-- Écouteurs Redmi Buds 6 Play déjà appairés à cet adaptateur.
+- Home Assistant on Linux with a local Bluetooth classic adapter accessible to Core.
+- Redmi Buds 6 Play already paired with that adapter.
 
-Les proxys Bluetooth BLE ESPHome ne prennent pas en charge cette connexion.
-Seul le modèle Redmi Buds 6 Play est pris en charge. L’environnement logiciel
-utilisé pour les tests est indiqué dans [VALIDATION.md](docs/VALIDATION.md).
+ESPHome BLE Bluetooth proxies cannot carry this connection. Only Redmi Buds 6
+Play is supported. Home Assistant 2026.10.0 or newer is required. See [VALIDATION.md](docs/VALIDATION.md)
+for the test environment.
 
-## Installation
+## Installation with HACS
 
-1. Télécharger et extraire le projet.
-2. Copier `custom_components/redmi_buds` dans `/config/custom_components/redmi_buds`.
-3. Redémarrer Home Assistant.
-4. Ouvrir le boîtier, réveiller les écouteurs et déconnecter temporairement le téléphone.
-5. Ouvrir **Paramètres → Appareils et services → Ajouter une intégration**,
-   puis rechercher **Redmi Buds 6 Play**.
-6. Sélectionner les écouteurs dans la liste des appareils appairés.
-7. Sur la fiche de l’appareil, appuyer sur **Actualiser**.
+Once the repository is public, add it as a custom repository in HACS:
 
-La saisie manuelle de l’adresse Bluetooth reste disponible si les écouteurs
-ne figurent pas dans la liste. L’intégration vérifie le modèle à la connexion.
-L’appairage initial et le dépannage sont décrits dans le [guide](DOCS.md).
+1. Open **HACS → Custom repositories**.
+2. Add `https://github.com/r-jean-pierre/home-assistant-redmi-buds`.
+3. Select **Integration**, download **Redmi Buds 6 Play**, and restart Home Assistant.
+4. Add the integration from **Settings → Devices & services** and select the earphones.
 
-## Actualisation
+## Manual installation
 
-L’actualisation est **manuelle par défaut**. Dans les options de l’intégration,
-choisir `0` pour le mode manuel ou un intervalle de **5 à 1440 minutes**.
-Les valeurs correspondent à la dernière lecture réussie.
+1. Download and extract the project.
+2. Copy `custom_components/redmi_buds` to `/config/custom_components/redmi_buds`.
+3. Restart Home Assistant.
+4. Open the case, wake the earphones, and temporarily disconnect the phone.
+5. Go to **Settings → Devices & services → Add integration** and search for
+   **Redmi Buds 6 Play**.
+6. Select the earphones from the paired devices list.
+7. Press **Refresh** on the device page.
 
-Une connexion depuis Home Assistant peut gêner la connexion audio du téléphone.
-Choisir un intervalle adapté à cet usage. Après un redémarrage en mode manuel,
-appuyer sur **Actualiser** pour obtenir les valeurs.
+Manual Bluetooth address entry is available if the earphones are missing from
+the list. The integration verifies the model when connecting. Pairing and
+troubleshooting instructions are available in the [user guide](DOCS.md).
 
-## Mise à jour
+## Refreshing
 
-Remplacer `/config/custom_components/redmi_buds`, puis redémarrer Home Assistant.
-Il n’est pas nécessaire de supprimer l’intégration ni de la configurer à nouveau.
+Refreshing is **manual by default**. In the integration options, choose `0`
+for manual mode or an interval of **5–1440 minutes**. Values represent the
+last successful read.
+
+A Home Assistant connection may interfere with phone audio. Choose a refresh
+interval that suits your usage. After restarting in manual mode, press
+**Refresh** to populate the values.
+
+## Updating
+
+Replace `/config/custom_components/redmi_buds` and restart Home Assistant.
+Keep the existing integration entry; no new setup is required.
 
 ## Documentation
 
-- [Utilisation et dépannage](DOCS.md)
+- [Usage and troubleshooting](DOCS.md)
 - [Architecture](docs/ARCHITECTURE.md)
-- [Tests et limites de validation](docs/VALIDATION.md)
+- [Tests and validation limits](docs/VALIDATION.md)
 - [Changelog](CHANGELOG.md)
+- [Contributing](CONTRIBUTING.md)
+- [Security policy](SECURITY.md)
 
-Code sous [licence MIT](LICENSE). Les attributions des ressources tierces
-figurent dans [NOTICE.md](NOTICE.md). Projet indépendant de Xiaomi.
+Code licensed under [MIT](LICENSE). Third-party resource attributions are in
+[NOTICE.md](NOTICE.md). This project is independent of Xiaomi.

@@ -1,0 +1,55 @@
+name: Bug report
+description: Report a problem with the Redmi Buds 6 Play integration.
+body:
+  - type: markdown
+    attributes:
+      value: For vulnerabilities, follow SECURITY.md instead of opening a public issue. Remove device addresses, serial numbers and credentials from attachments.
+  - type: input
+    id: integration_version
+    attributes:
+      label: Integration version
+    validations:
+      required: true
+  - type: input
+    id: ha_version
+    attributes:
+      label: Home Assistant version
+    validations:
+      required: true
+  - type: dropdown
+    id: installation
+    attributes:
+      label: Home Assistant installation type
+      options:
+        - Home Assistant OS
+        - Home Assistant Container
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: bluetooth
+    attributes:
+      label: Bluetooth adapter
+      description: Include USB passthrough details if using a virtual machine.
+  - type: input
+    id: firmware
+    attributes:
+      label: Earphone firmware version
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Describe the actual and expected behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs and diagnostics
+      description: Remove personal identifiers before sharing. Do not upload a complete Home Assistant backup.

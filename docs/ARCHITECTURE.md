@@ -1,59 +1,60 @@
 # Architecture
 
-## Organisation
+## Components
 
-```text
-custom_components/redmi_buds/
-  mma/                 Codec et client indépendants de Home Assistant
-  config_flow.py       Choix par nom ou saisie manuelle, vérification VID/PID ; options
-  coordinator.py       Sérialisation asyncio et exécution hors boucle
-  entity.py            Identité stable et disponibilité
-  sensor.py            Batteries, longs, date, diagnostics locaux
-  binary_sensor.py     Charge
-  switch.py            Faible latence
-  select.py            EQ et taps
-  button.py            Actualisation
-  diagnostics.py       Export par liste de champs autorisés
-```
+| Module | Responsibility |
+| --- | --- |
+| `mma/` | Protocol codec, data models, BlueZ discovery and RFCOMM client |
+| `config_flow.py` | Device selection, manual setup, model verification and options |
+| `coordinator.py` | Shared reads and writes, scheduling and executor calls |
+| `entity.py` | Device identity and availability |
+| `sensor.py` | Batteries, read-only gestures, timestamps and device information |
+| `binary_sensor.py` | Charging status |
+| `switch.py` | Low latency |
+| `select.py` | Audio balance and gesture settings |
+| `button.py` | Manual refresh |
+| `diagnostics.py` | Diagnostic export |
 
-Le transport synchrone ne dépend que de la bibliothèque standard. Un verrou de
-thread protège les transactions, y compris si un appelant asyncio est annulé.
-Un verrou asyncio du coordinateur sérialise les lectures et écritures. Une socket
-appartient à une seule transaction ; fermeture sur succès, erreur et arrêt.
-L’arrêt ferme la socket active pour interrompre une lecture, puis attend la fin
-de l’opération avant de terminer le déchargement.
+## Transactions
 
-Le parseur respecte la longueur annoncée, bornée à 1024 octets de corps. Il
-conserve un préfixe d’en-tête fragmenté, traite les trames concaténées et se
-resynchronise sur les en-têtes après longueurs invalides ou mauvais terminateurs.
-Un `EF` dans les données ne termine pas la trame. Un en-tête à longueur plausible
-mais incomplet reste en attente jusqu’à réception de la suite ou expiration du délai.
+The synchronous transport uses the Python standard library and runs in Home
+Assistant’s executor. A thread lock protects client transactions, and an
+asyncio lock serializes coordinator operations. Each transaction owns one
+socket, closed on completion or error. Unloading closes the active socket
+and waits for its operation to finish.
 
-Une réponse n’achève une requête que si type réponse, opcode, séquence et statut
-conviennent. Les notifications reçues pendant les échanges sont acquittées
-lorsqu’elles le demandent. Elles ne remplacent pas la relecture complète et ne
-sont pas transformées en événements physiques de gestes. Une requête entrante
-inconnue reçoit le statut `FF`. Les acquittements utilisent les flags `00`.
+Connection timeout is 15 seconds, response timeout is 5 seconds and the
+exchange session has a 30-second deadline. Writes are not retried automatically.
+Gesture writes read the current configuration to preserve the other earphone,
+then reread all settings to reflect changes involving more than one gesture.
 
-Les délais sont bornés : connexion 15 s, réponse 5 s, échanges de session 30 s.
-Les séquences évoluent modulo 256 avec une valeur initiale aléatoire. Aucune
-écriture n’est réessayée automatiquement.
+## Frame parsing
 
-L’export diagnostic utilise une liste explicite de champs et n’inclut ni
-configuration d’entrée brute, ni nom libre, ni MAC, ni série, ni trame complète,
-ni message d’exception arbitraire. Les octets bruts de batteries et firmware
-restent disponibles dans cet export.
+The parser uses frame lengths, with a maximum body size of 1024 bytes. It
+handles fragmented headers, partial frames and concatenated frames, and
+resynchronizes after invalid lengths or terminators. Header and terminator
+bytes inside a payload remain part of that payload.
 
-## Sélection des appareils appairés
+Responses must match the pending opcode and sequence and have a successful
+status. Notifications requesting a reply are acknowledged with response flags
+`00`. Unsupported incoming requests receive status `FF`. Notifications do not
+produce physical gesture events in Home Assistant.
 
-Le module `mma/bluez.py` lit les objets gérés de BlueZ via le helper
-`bluetooth_adapters.dbus.get_dbus_managed_objects`, fourni par la dépendance
-Bluetooth native de HA. Ce helper décode les variants et ferme sa connexion
-D-Bus. Un délai global de cinq secondes borne sa lecture. Le parseur conserve
-les `org.bluez.Device1` appairés, non bloqués, à adresse publique valide,
-privilégie l’alias pour l’affichage et regroupe une adresse présente sur
-plusieurs contrôleurs.
+## Paired device selection
 
-Les noms servent au tri et à la présélection. Après validation du choix, une
-lecture du VID/PID vérifie le modèle. Les appareils déjà configurés sont
-écartés de la liste. La sélection ne lance ni appairage ni scan radio.
+`mma/bluez.py` reads BlueZ managed objects through
+`bluetooth_adapters.dbus.get_dbus_managed_objects`, provided by Home Assistant’s
+Bluetooth dependency. The read has a five-second timeout. Candidates must be
+paired, unblocked devices with a valid public Bluetooth address. Aliases are
+used for display, and addresses present on several controllers are deduplicated.
+
+Names determine sorting and preselection. Product verification uses a VID/PID
+read after setup submission. Already configured devices are excluded. Listing
+candidates does not initiate pairing or a radio scan.
+
+## Diagnostics
+
+Diagnostic exports use an explicit field list. Bluetooth addresses, serial
+numbers, free-form device names, complete frames and arbitrary exception
+messages are excluded. Raw battery and firmware fields remain available
+for troubleshooting.

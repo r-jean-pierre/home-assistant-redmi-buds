@@ -1,62 +1,65 @@
-# Tests et validation
+# Tests and validation
 
-## Environnement de test
+## Test environment
 
 - CPython 3.14.8.
 - Home Assistant 2026.10.2.
 - `pytest-homeassistant-custom-component==0.13.373`.
+- `pytest-cov==7.1.0`.
 - Ruff 0.17.1.
 
-La dernière exécution complète a produit **50 tests réussis**, dont 28 tests
-unitaires et 22 tests avec le logiciel Home Assistant. Le Bluetooth et les
-écouteurs sont simulés ; cette suite ne constitue pas un test matériel.
+The test suite passes **50 tests and 14 subtests**, with **88% coverage**
+including branches. Ruff lint and formatting checks pass. Bluetooth sockets
+and earphones are simulated; Home Assistant runs in the test environment.
 
-## Exécuter les contrôles
+## Run checks
 
-Depuis la racine du projet, avec Python 3.14 :
+With Python 3.14, from the repository root:
 
 ```bash
 python -m pip install -r requirements_test.txt
-python -m pytest -q --disable-warnings --tb=short
+python -m pytest -q --cov=custom_components.redmi_buds --cov=mma --cov-report=term-missing
+python -m ruff check .
+python -m ruff format --check .
 ```
 
-Les tests autonomes du protocole, du client et de la sélection d’appareils
-peuvent aussi être exécutés avec Python 3.12 ou ultérieur :
+The standalone protocol, client and discovery tests also support Python 3.12+:
 
 ```bash
 python3 -m unittest tests.test_protocol tests.test_client tests.test_discovery -v
 ```
 
-## Couverture
+## Coverage
 
-- Construction et décodage des trames, fragmentation, concaténation et données invalides.
-- Vérification du modèle, délais, réponses et notifications.
-- Fermeture des connexions et arrêt des opérations en cours.
-- Lecture des batteries, de la charge, du firmware et des réglages.
-- Écriture des gestes, conservation du côté opposé et relecture après modification.
-- Formulaires de configuration, sélection BlueZ, doublons et saisie manuelle.
-- Options d’actualisation, minuterie, disponibilité et horodatage.
-- Entités, traduction des états et export diagnostic sans adresse ni numéro de série.
+- Frame encoding, parsing, fragmentation, concatenation and invalid data.
+- Product checks, responses, notifications and timeouts.
+- Connection cleanup and cancellation of active operations.
+- Battery, charging, firmware and settings decoding.
+- Gesture writes, opposite-side preservation and full readback.
+- Setup, paired-device selection, duplicate handling and manual fallback.
+- Refresh options, scheduling, availability and timestamps.
+- Entity states, translations and diagnostic privacy.
 
-Les contrôles de présentation comprennent la validité des JSON, la cohérence
-des libellés anglais et les icônes de charge pour les états actif, inactif et inconnu.
-HACS et Hassfest n’ont pas été exécutés.
+JSON and YAML files and relative documentation links are checked during
+packaging. The workflow includes Hassfest and HACS validation; neither has
+been executed in this environment. HACS validation is skipped for private
+repositories. A scheduled, non-blocking job checks the latest Home Assistant
+test harness separately from the pinned test environment.
 
-## Limites matérielles
+## Hardware validation
 
-| Fonction | État de validation matérielle |
+| Feature | Status |
 | --- | --- |
-| Connexion et lecture complète | Fonctionnement confirmé sur Redmi Buds 6 Play |
-| Batteries, série et réglages | Lectures comparées à l’application Xiaomi Earbuds |
-| Charge | Transitions et comportement boîtier fermé à vérifier |
-| Faible latence | Écriture ON/OFF confirmée ; persistance du réglage à vérifier |
-| Profils audio | Cinq profils lus ; écriture confirmée pour Balanced sound |
-| Gestes simples, doubles et triples | Écritures confirmées ; toutes les combinaisons et la conservation du côté opposé restent à vérifier sur le matériel |
-| Appuis longs | Lecture confirmée ; écriture directe à valider sur le matériel |
-| Action photo | Couplage simple/long observé ; règles complètes non établies |
-| Firmware | Correspondance connue de la signature 20222022 vers 2.0.2.2 ; autres signatures affichées brutes |
-| Connexion du téléphone | Contention possible ; reprise audio et stabilité prolongée à vérifier |
+| Connection and complete read | Confirmed on Redmi Buds 6 Play |
+| Batteries, serial number and settings | Compared with Xiaomi Earbuds |
+| Charging | State transitions and closed-case behavior need further checks |
+| Low latency | ON/OFF writes confirmed; persistence needs further checks |
+| Audio profiles | Five profiles read; Balanced sound write confirmed |
+| Single, double and triple taps | Writes confirmed; all combinations and opposite-side preservation need hardware checks |
+| Press and hold | Read confirmed; direct writes need hardware validation |
+| Photo action | Single/hold coupling observed; full rules are not established |
+| Firmware | Known signature 20222022 maps to 2.0.2.2; other signatures remain raw |
+| Phone coexistence | Bluetooth contention is possible; audio recovery and long-term stability need further checks |
 
-Les tests automatisés ne valident ni le comportement physique des gestes ni
-la cohabitation audio avec le téléphone. Voir le [guide utilisateur](../DOCS.md)
-pour la configuration et le dépannage.
+Automated tests do not establish physical gesture behavior or phone audio
+coexistence. See the [user guide](../DOCS.md) for setup and troubleshooting.

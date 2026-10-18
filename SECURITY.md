@@ -1,53 +1,45 @@
-# Politique de sécurité
+# Security policy
 
-## Versions prises en charge
+## Supported versions
 
-Les correctifs de sécurité sont apportés à la dernière version publiée.
-Si vous utilisez une version plus ancienne, mettez l’intégration à jour avant
-de vérifier si le problème est toujours présent.
+Security fixes target the latest published release. Upgrade older installations
+before checking whether a problem still occurs. Before the first release,
+reports apply to the `main` branch.
 
-Avant la première publication, les signalements concernent la branche `main`.
+## Reporting a vulnerability
 
-## Signaler une vulnérabilité
+Report vulnerabilities privately. Do not open a public issue or pull request
+with exploit details.
 
-Merci de signaler les vulnérabilités en privé, sans ouvrir d’issue publique ni
-de pull request contenant les détails d’exploitation.
+Use **Security → Advisories → Report a vulnerability** on GitHub:
 
-Sur GitHub, utilisez **Security → Advisories → Report a vulnerability** :
+[Report a vulnerability](https://github.com/r-jean-pierre/home-assistant-redmi-buds/security/advisories/new)
 
-[Signaler une vulnérabilité](https://github.com/r-jean-pierre/home-assistant-redmi-buds/security/advisories/new)
+If private reporting is unavailable, arrange a private contact with the
+maintainer before sending technical details. Do not post an exploit in a
+public issue to request contact.
 
-Si cette option est indisponible, contactez le mainteneur par un canal privé
-avant de transmettre les détails techniques. Ne publiez pas de preuve
-d’exploitation dans une issue pour demander un contact.
+Include:
 
-Un signalement utile comprend :
+- Integration and Home Assistant versions.
+- Installation type and Bluetooth adapter.
+- A description of the vulnerability and its impact.
+- Prerequisites and steps to reproduce it.
+- A minimal proof of concept, if available.
 
-- la version de l’intégration et de Home Assistant ;
-- le type d’installation et l’adaptateur Bluetooth utilisé ;
-- une description du problème et de son impact ;
-- les conditions nécessaires et les étapes pour le reproduire ;
-- une preuve de concept minimale, si disponible.
+Remove passwords, tokens, Bluetooth addresses and serial numbers from logs
+and screenshots. Do not send a full Home Assistant backup.
 
-Retirez les mots de passe, jetons, adresses Bluetooth et numéros de série des
-journaux et captures. N’envoyez pas de sauvegarde complète de Home Assistant.
+## Handling reports
 
-## Traitement des signalements
+The maintainer reviews reports and may request additional information.
+Confirmed vulnerabilities are addressed with coordinated disclosure. Response
+and fix times depend on severity and maintainer availability. Contributor
+credit is provided with the reporter’s agreement.
 
-Le mainteneur examine le signalement et peut demander des informations
-complémentaires. Lorsqu’une vulnérabilité est confirmée, la correction et la
-publication des détails sont coordonnées avec la personne qui l’a signalée.
-Le délai dépend de la gravité du problème et de la disponibilité du mainteneur.
+## Scope
 
-Merci de laisser le temps de préparer un correctif avant de rendre les détails
-publics. Les contributions peuvent être créditées avec l’accord de leur auteur.
-
-## Périmètre
-
-Cette politique concerne le code de l’intégration Redmi Buds 6 Play et ses
-fichiers de configuration. Les vulnérabilités de Home Assistant, de BlueZ ou
-du firmware des écouteurs doivent être signalées aux projets ou fournisseurs
-concernés.
-
-Pour un problème de connexion, un réglage qui ne persiste pas ou une demande
-de fonctionnalité sans impact de sécurité, utilisez les issues du dépôt.
+This policy covers this integration and its configuration files. Report issues
+in Home Assistant, BlueZ or earphone firmware to their respective maintainers
+or vendors. Use regular repository issues for connection failures, feature
+requests and other problems without a security impact.
