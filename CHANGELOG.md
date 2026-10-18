@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased — Initial release
+## 0.1.0 — 2026-10-19
 
 - UI setup with paired-device selection and manual address entry.
 - Battery levels and charging status for both earphones and the case.
