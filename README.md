@@ -19,6 +19,10 @@ French translations.
 Gesture settings configure the earphones’ actions. They do not produce
 physical tap events for Home Assistant automations.
 
+## Preview
+
+![Redmi Buds 6 Play device page in Home Assistant](docs/images/home-assistant-device.webp)
+
 ## Requirements
 
 - Home Assistant on Linux with a local Bluetooth classic adapter accessible to Core.
