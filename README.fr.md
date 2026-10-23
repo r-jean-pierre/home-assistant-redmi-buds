@@ -19,6 +19,10 @@ configuration dans l’interface et traductions en français et en anglais.
 Les réglages de gestes modifient les actions des écouteurs. Ils ne génèrent
 pas d’événements d’appui utilisables dans les automatisations Home Assistant.
 
+## Aperçu
+
+![Redmi Buds 6 Play device page in Home Assistant](docs/images/home-assistant-device.webp)
+
 ## Prérequis
 
 - Home Assistant sous Linux, avec un adaptateur Bluetooth classique local accessible à Core.
