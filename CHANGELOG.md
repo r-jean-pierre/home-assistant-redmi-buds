@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.1 — 2026-10-28
 
 - Report failed readback after an accepted write as an unconfirmed write,
   including rejected read requests. Preserve unconfirmed-write errors when
