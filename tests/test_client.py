@@ -5,10 +5,14 @@ from concurrent.futures import ThreadPoolExecutor
 
 from mma.client import BudsClient, Session
 from mma.protocol import (
+    GET_CONFIG,
+    GET_INFO,
+    SET_CONFIG,
     ConnectionError,
     DeviceRejected,
     IncompatibleDevice,
     RequestTimeout,
+    StreamParser,
     WriteUnconfirmed,
 )
 
@@ -107,11 +111,84 @@ class ClientTests(unittest.TestCase):
         self.assertEqual(len([f for f in sock.sent if f.opcode == 0xF2]), 1)
         self.assertTrue(sock.closed)
 
+    def test_applied_write_with_lost_ack_is_unconfirmed(self):
+        class LostAckSocket(FakeSocket):
+            def sendall(self, data):
+                frame = StreamParser().feed(data)[0]
+                super().sendall(data)
+                if frame.is_request and frame.opcode == SET_CONFIG:
+                    self.pending.clear()
+
+        sock = LostAckSocket()
+        with self.assertRaises(WriteUnconfirmed) as caught:
+            self.client(sock).set_config(7, 0)
+        self.assertIsInstance(caught.exception.__cause__, ConnectionError)
+        self.assertEqual(sock.config[7], b"\x00")
+        self.assertEqual(sum(f.opcode == SET_CONFIG for f in sock.sent), 1)
+        self.assertTrue(sock.closed)
+
+    def test_readback_failure_after_accepted_write_is_unconfirmed(self):
+        class ReadbackFailureSocket(FakeSocket):
+            def __init__(self, opcode, config_id, failure):
+                super().__init__()
+                self.failure_target = (opcode, config_id)
+                self.failure = failure
+
+            def sendall(self, data):
+                frame = StreamParser().feed(data)[0]
+                config_id = (
+                    int.from_bytes(frame.data, "big")
+                    if frame.opcode == GET_CONFIG
+                    else None
+                )
+                written = any(f.opcode == SET_CONFIG for f in self.sent)
+                if (
+                    written
+                    and frame.is_request
+                    and (frame.opcode, config_id) == self.failure_target
+                ):
+                    self.sent.append(frame)
+                    if self.failure == "reject":
+                        self.pending.extend(
+                            response(frame.opcode, frame.sequence, status=0xFF)
+                        )
+                    elif self.failure == "oserror":
+                        raise OSError("Readback connection failed")
+                    return
+                super().sendall(data)
+
+        targets = [
+            (GET_INFO, None),
+            (GET_CONFIG, 0x27),
+            (GET_CONFIG, 0x2F),
+            (GET_CONFIG, 7),
+            (GET_CONFIG, 2),
+        ]
+        for opcode, config_id in targets:
+            for failure in ("reject", "eof", "oserror"):
+                with self.subTest(opcode=opcode, config_id=config_id, failure=failure):
+                    sock = ReadbackFailureSocket(opcode, config_id, failure)
+                    with self.assertRaisesRegex(
+                        WriteUnconfirmed, "refresh before trying again"
+                    ) as caught:
+                        self.client(sock).set_config(7, 0)
+                    expected_cause = {
+                        "reject": DeviceRejected,
+                        "eof": ConnectionError,
+                        "oserror": OSError,
+                    }[failure]
+                    self.assertIsInstance(caught.exception.__cause__, expected_cause)
+                    self.assertEqual(sock.config[7], b"\x00")
+                    self.assertEqual(sum(f.opcode == SET_CONFIG for f in sock.sent), 1)
+                    self.assertTrue(sock.closed)
+
     def test_rejected_write(self):
         sock = FakeSocket()
         sock.reject_write = True
         with self.assertRaises(DeviceRejected):
             self.client(sock).set_config(7, 0)
+        self.assertEqual(sock.config[7], b"\x05")
+        self.assertEqual([f.opcode for f in sock.sent], [GET_INFO, SET_CONFIG])
         self.assertTrue(sock.closed)
 
     def test_connect_failure_closes_socket(self):

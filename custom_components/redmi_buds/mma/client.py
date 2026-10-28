@@ -187,10 +187,16 @@ class BudsClient:
     def _write_read(self, session: Session, config_id: int, value: bytes) -> Snapshot:
         try:
             session.request(SET_CONFIG, config_payload(config_id, value))
-            # Includes all gestures, since single/long settings can be coupled.
-            return self._read_all(session)
         except DeviceRejected:
             raise
+        except (BudsError, OSError) as err:
+            raise WriteUnconfirmed(
+                "Write may have applied; refresh before trying again"
+            ) from err
+
+        try:
+            # Includes all gestures, since single/long settings can be coupled.
+            return self._read_all(session)
         except (BudsError, OSError) as err:
             raise WriteUnconfirmed(
                 "Write may have applied; refresh before trying again"

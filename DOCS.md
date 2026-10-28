@@ -44,6 +44,12 @@ Press **Refresh** on the device page to read batteries, charging status and
 settings. Battery levels are percentages; charging entities are on/off indicators.
 Their icons distinguish charging, not charging and unknown states.
 
+Battery levels have been observed in 10-percentage-point steps in Home Assistant
+and Xiaomi Earbuds. The integration displays the values reported by the device
+without rounding or interpolation; reporting resolution may vary with firmware.
+Raw values `0x00` and `0x80` currently produce an unknown state because their
+meaning at full discharge has not been verified on the earphones.
+
 Values reflect the last read. A failed read makes measurements unavailable
 while retaining **Last successful read**. Wake the earphones and refresh again.
 Manual mode does not restore measurements after a Home Assistant restart.
