@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Report failed readback after an accepted write as an unconfirmed write,
+  including rejected read requests. Preserve unconfirmed-write errors when
+  the write acknowledgement is lost.
+- Document observed battery reporting in 10-percentage-point steps.
+
 ## 0.1.0 — 2026-10-19
 
 - UI setup with paired-device selection and manual address entry.
