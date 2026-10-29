@@ -84,8 +84,7 @@ Use the selects in the device’s **Configuration** section.
 Single, double and triple taps offer **None**, **Play/Pause**, **Volume up**,
 **Volume down**, **Previous song**, **Next song** and **Take photo**.
 Press and hold offers **None**, **Voice assistant** and **Take photo**.
-The long-press sensors under **Diagnostic** are read-only; use the
-configuration selects to change their values.
+Use these configuration selects to both view and change the long-press actions.
 
 After a change, the integration reads all settings again. Some actions,
 particularly **Take photo**, may also affect another gesture. According to

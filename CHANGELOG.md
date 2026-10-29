@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- Remove the duplicate read-only long-press sensors. View and change long-press
+  actions through the configuration selects.
+- Remove the retired sensor entries automatically when the integration loads.
+  Dashboards and automations using those sensors must use the corresponding
+  select entities instead.
+
 ## 0.1.1 — 2026-10-28
 
 - Report failed readback after an accepted write as an unconfirmed write,

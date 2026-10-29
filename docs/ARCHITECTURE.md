@@ -8,7 +8,7 @@
 | `config_flow.py` | Device selection, manual setup, model verification and options |
 | `coordinator.py` | Shared reads and writes, scheduling and executor calls |
 | `entity.py` | Device identity and availability |
-| `sensor.py` | Batteries, read-only gestures, timestamps and device information |
+| `sensor.py` | Batteries, timestamps and device information |
 | `binary_sensor.py` | Charging status |
 | `switch.py` | Low latency |
 | `select.py` | Audio balance and gesture settings |

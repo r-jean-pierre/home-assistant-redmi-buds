@@ -8,7 +8,7 @@
 - `pytest-cov==7.1.0`.
 - Ruff 0.17.1.
 
-The test suite passes **52 tests and 29 subtests**, with **88% coverage**
+The test suite passes **54 tests and 29 subtests**, with **89% coverage**
 including branches. Ruff lint and formatting checks pass. Bluetooth sockets
 and earphones are simulated; Home Assistant runs in the test environment.
 
@@ -41,6 +41,8 @@ python3 -m unittest tests.test_protocol tests.test_client tests.test_discovery -
 - Setup, paired-device selection, duplicate handling and manual fallback.
 - Refresh options, scheduling, availability and timestamps.
 - Entity states, translations and diagnostic privacy.
+- Removal of legacy long-press sensors, including renamed or disabled entries,
+  while preserving configuration selects and other devices.
 
 JSON and YAML files and relative documentation links are checked during
 packaging. The workflow includes Hassfest and HACS validation; neither has

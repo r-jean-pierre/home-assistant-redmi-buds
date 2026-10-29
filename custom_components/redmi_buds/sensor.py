@@ -1,4 +1,4 @@
-"""Batteries, read-only long presses and last observation time."""
+"""Battery levels, device information and last successful read."""
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -6,24 +6,33 @@ from homeassistant.components.sensor import (
     SensorStateClass,
 )
 from homeassistant.const import PERCENTAGE, EntityCategory
+from homeassistant.helpers import entity_registry as er
 
+from .const import CONF_ADDRESS, DOMAIN
 from .entity import BudsEntity
-from .mma.model import ACTIONS, label_for
 
 PARALLEL_UPDATES = 0
 
 
 async def async_setup_entry(hass, entry, async_add_entities) -> None:
     coordinator = entry.runtime_data
+    registry = er.async_get(hass)
+    removed_unique_ids = {
+        f"{entry.data[CONF_ADDRESS]}_gesture_long_{side}" for side in ("left", "right")
+    }
+    for entity in er.async_entries_for_config_entry(registry, entry.entry_id):
+        if (
+            entity.domain == "sensor"
+            and entity.platform == DOMAIN
+            and entity.unique_id in removed_unique_ids
+        ):
+            registry.async_remove(entity.entity_id)
+
     async_add_entities(
         [
             *(
                 BatterySensor(coordinator, side, i)
                 for i, side in enumerate(("left", "right", "case"))
-            ),
-            *(
-                LongPressSensor(coordinator, side, i)
-                for i, side in enumerate(("left", "right"))
             ),
             LastReadSensor(coordinator),
             FirmwareSensor(coordinator),
@@ -49,24 +58,6 @@ class BatterySensor(BudsEntity, SensorEntity):
             if data and data.info.batteries
             else None
         )
-
-
-class LongPressSensor(BudsEntity, SensorEntity):
-    _attr_device_class = SensorDeviceClass.ENUM
-    _attr_entity_category = EntityCategory.DIAGNOSTIC
-    _attr_options = [*ACTIONS, "unrecognized"]
-
-    def __init__(self, coordinator, side, index) -> None:
-        super().__init__(coordinator, f"gesture_long_{side}")
-        self.index = index
-
-    @property
-    def native_value(self):
-        data = self.coordinator.data
-        if not data or 3 not in data.gestures:
-            return None
-        value = label_for(ACTIONS, data.gestures[3][self.index])
-        return value if value in ACTIONS else "unrecognized"
 
 
 class LastReadSensor(BudsEntity, SensorEntity):
