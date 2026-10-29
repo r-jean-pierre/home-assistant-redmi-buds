@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.2 — 2026-10-29
 
 - Remove the duplicate read-only long-press sensors. View and change long-press
   actions through the configuration selects.
