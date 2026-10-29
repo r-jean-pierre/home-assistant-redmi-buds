@@ -9,7 +9,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import probatio
 import pytest
-from homeassistant.config_entries import SOURCE_USER
+from homeassistant.config_entries import SOURCE_USER, ConfigEntryDisabler
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import device_registry as dr
@@ -79,8 +79,12 @@ async def test_setup_manual_refresh_entities_and_unload(hass, client):
     assert hass.states.get(eid(hass, "switch", "low_latency")).state == "on"
     assert hass.states.get(eid(hass, "select", "equalizer")).state == "bass"
     assert (
-        hass.states.get(eid(hass, "sensor", "gesture_long_right")).state == "take_photo"
+        hass.states.get(eid(hass, "select", "gesture_long_right")).state == "take_photo"
     )
+    registry = er.async_get(hass)
+    assert len(er.async_entries_for_config_entry(registry, entry.entry_id)) == 20
+    for side in ("left", "right"):
+        assert eid(hass, "sensor", f"gesture_long_{side}") is None
     assert await hass.config_entries.async_unload(entry.entry_id)
     client.close.assert_called_once()
 
@@ -192,10 +196,92 @@ async def test_long_press_controls_and_coupled_readback(hass, client, snapshot):
         hass.states.get(eid(hass, "select", "gesture_single_right")).state
         == "take_photo"
     )
-    # Diagnostic sensors and configuration selects share the same state.
-    assert (
-        hass.states.get(eid(hass, "sensor", "gesture_long_right")).state == "take_photo"
+
+
+@pytest.mark.parametrize("disabled", [False, True])
+async def test_setup_removes_only_legacy_long_press_sensors(hass, client, disabled):
+    registry = er.async_get(hass)
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        unique_id=ADDRESS,
+        title="Redmi Buds 6 Play",
+        data={"address": ADDRESS, "channel": 6},
     )
+    entry.add_to_hass(hass)
+    other_address = "AA:BB:CC:DD:EE:02"
+    other_entry = MockConfigEntry(
+        domain=DOMAIN,
+        unique_id=other_address,
+        data={"address": other_address, "channel": 6},
+        disabled_by=ConfigEntryDisabler.USER,
+    )
+    other_entry.add_to_hass(hass)
+
+    removed = []
+    preserved = []
+    for side in ("left", "right"):
+        key = f"gesture_long_{side}"
+        legacy = registry.async_get_or_create(
+            "sensor",
+            DOMAIN,
+            f"{ADDRESS}_{key}",
+            config_entry=entry,
+            disabled_by=er.RegistryEntryDisabler.USER if disabled else None,
+        )
+        renamed = registry.async_update_entity(
+            legacy.entity_id, new_entity_id=f"sensor.custom_hold_{side}"
+        )
+        removed.append(renamed.entity_id)
+        select = registry.async_get_or_create(
+            "select", DOMAIN, f"{ADDRESS}_{key}", config_entry=entry
+        )
+        select = registry.async_update_entity(
+            select.entity_id,
+            new_entity_id=f"select.custom_hold_{side}",
+            name=f"Custom hold {side}",
+        )
+        preserved.append(select)
+        preserved.append(
+            registry.async_get_or_create(
+                "sensor", DOMAIN, f"{other_address}_{key}", config_entry=other_entry
+            )
+        )
+
+    preserved.append(
+        registry.async_get_or_create(
+            "sensor", DOMAIN, f"{ADDRESS}_battery_left", config_entry=entry
+        )
+    )
+
+    with patch("custom_components.redmi_buds.BudsClient", return_value=client):
+        assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+    client.read.assert_not_called()
+    for entity_id in removed:
+        assert registry.async_get(entity_id) is None
+        assert hass.states.get(entity_id) is None
+    for entity in preserved:
+        assert registry.async_get(entity.entity_id).id == entity.id
+    for side in ("left", "right"):
+        key = f"gesture_long_{side}"
+        assert eid(hass, "sensor", key) is None
+        assert eid(hass, "select", key) == f"select.custom_hold_{side}"
+        assert (
+            registry.async_get(eid(hass, "select", key)).name == f"Custom hold {side}"
+        )
+
+    await entry.runtime_data.async_refresh()
+    assert hass.states.get("select.custom_hold_left").state == "voice_assistant"
+    assert hass.states.get("select.custom_hold_right").state == "take_photo"
+    with patch("custom_components.redmi_buds.BudsClient", return_value=client):
+        assert await hass.config_entries.async_reload(entry.entry_id)
+    await hass.async_block_till_done()
+    for entity_id in removed:
+        assert registry.async_get(entity_id) is None
+    for side in ("left", "right"):
+        assert (
+            eid(hass, "select", f"gesture_long_{side}") == f"select.custom_hold_{side}"
+        )
 
 
 async def test_io_does_not_block_event_loop_and_unload_interrupts(

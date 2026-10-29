@@ -73,34 +73,6 @@
       },
       "serial_number": {
         "name": "Serial number"
-      },
-      "gesture_long_left": {
-        "name": "Press and hold left earphone",
-        "state": {
-          "voice_assistant": "Voice assistant",
-          "play_pause": "Play/Pause",
-          "previous_track": "Previous song",
-          "next_track": "Next song",
-          "volume_up": "Volume up",
-          "volume_down": "Volume down",
-          "none": "None",
-          "take_photo": "Take photo",
-          "unrecognized": "Unrecognized"
-        }
-      },
-      "gesture_long_right": {
-        "name": "Press and hold right earphone",
-        "state": {
-          "voice_assistant": "Voice assistant",
-          "play_pause": "Play/Pause",
-          "previous_track": "Previous song",
-          "next_track": "Next song",
-          "volume_up": "Volume up",
-          "volume_down": "Volume down",
-          "none": "None",
-          "take_photo": "Take photo",
-          "unrecognized": "Unrecognized"
-        }
       }
     },
     "binary_sensor": {

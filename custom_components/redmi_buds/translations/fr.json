@@ -73,34 +73,6 @@
       },
       "serial_number": {
         "name": "Numéro de série"
-      },
-      "gesture_long_left": {
-        "name": "Appui long gauche",
-        "state": {
-          "voice_assistant": "Assistant vocal",
-          "play_pause": "Lecture/pause",
-          "previous_track": "Piste précédente",
-          "next_track": "Piste suivante",
-          "volume_up": "Volume +",
-          "volume_down": "Volume −",
-          "none": "Aucune action",
-          "take_photo": "Prendre une photo",
-          "unrecognized": "Non reconnu"
-        }
-      },
-      "gesture_long_right": {
-        "name": "Appui long droit",
-        "state": {
-          "voice_assistant": "Assistant vocal",
-          "play_pause": "Lecture/pause",
-          "previous_track": "Piste précédente",
-          "next_track": "Piste suivante",
-          "volume_up": "Volume +",
-          "volume_down": "Volume −",
-          "none": "Aucune action",
-          "take_photo": "Prendre une photo",
-          "unrecognized": "Non reconnu"
-        }
       }
     },
     "binary_sensor": {
