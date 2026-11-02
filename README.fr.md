@@ -32,7 +32,17 @@ Les proxys Bluetooth BLE ESPHome ne prennent pas en charge cette connexion.
 Seul le modèle Redmi Buds 6 Play est pris en charge. L’environnement logiciel
 utilisé pour les tests est indiqué dans [VALIDATION.md](docs/VALIDATION.md).
 
-## Installation
+## Installation avec HACS
+
+1. Ouvrir **HACS** et rechercher **Redmi Buds 6 Play**.
+2. Télécharger l’intégration, puis redémarrer Home Assistant.
+3. Ouvrir le boîtier, réveiller les écouteurs et déconnecter temporairement le téléphone.
+4. Ouvrir **Paramètres → Appareils et services → Ajouter une intégration**,
+   puis rechercher **Redmi Buds 6 Play**.
+5. Sélectionner les écouteurs dans la liste des appareils appairés.
+6. Sur la fiche de l’appareil, appuyer sur **Actualiser**.
+
+## Installation manuelle
 
 1. Télécharger et extraire le projet.
 2. Copier `custom_components/redmi_buds` dans `/config/custom_components/redmi_buds`.
