@@ -34,12 +34,13 @@ for the test environment.
 
 ## Installation with HACS
 
-Once the repository is public, add it as a custom repository in HACS:
-
-1. Open **HACS → Custom repositories**.
-2. Add `https://github.com/r-jean-pierre/home-assistant-redmi-buds`.
-3. Select **Integration**, download **Redmi Buds 6 Play**, and restart Home Assistant.
-4. Add the integration from **Settings → Devices & services** and select the earphones.
+1. Open **HACS** and search for **Redmi Buds 6 Play**.
+2. Download the integration and restart Home Assistant.
+3. Open the case, wake the earphones, and temporarily disconnect the phone.
+4. Go to **Settings → Devices & services → Add integration** and search for
+   **Redmi Buds 6 Play**.
+5. Select the earphones from the paired devices list.
+6. Press **Refresh** on the device page.
 
 ## Manual installation
 
