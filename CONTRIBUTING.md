@@ -41,9 +41,11 @@ synthetic addresses and serial numbers in fixtures.
 
 ## Continuous integration
 
-Pushes and pull requests run tests with coverage, Ruff and Hassfest. HACS
-validation also runs for public repositories. A weekly, non-blocking job checks
-compatibility with the latest Home Assistant test harness.
+Pushes and pull requests run the same integration tests on the declared
+minimum Home Assistant version and on the recent version pinned in
+`requirements_test.txt`. The recent job also measures coverage. Ruff and
+Hassfest run separately, and HACS validation runs for public repositories.
+A weekly, non-blocking job checks the latest available Home Assistant test harness.
 
 ## Releases
 
