@@ -29,7 +29,7 @@ physical tap events for Home Assistant automations.
 - Redmi Buds 6 Play already paired with that adapter.
 
 ESPHome BLE Bluetooth proxies cannot carry this connection. Only Redmi Buds 6
-Play is supported. Home Assistant 2026.10.0 or newer is required. See [VALIDATION.md](docs/VALIDATION.md)
+Play is supported. Home Assistant 2026.1.0 or newer is required. See [VALIDATION.md](docs/VALIDATION.md)
 for the test environment.
 
 ## Installation with HACS

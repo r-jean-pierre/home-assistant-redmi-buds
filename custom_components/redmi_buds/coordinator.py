@@ -52,16 +52,16 @@ class BudsCoordinator(DataUpdateCoordinator[Snapshot | None]):
 
     def _update_device_metadata(self, snapshot: Snapshot) -> None:
         registry = dr.async_get(self.hass)
-        device = registry.async_get_device_by_identifier(
-            (DOMAIN, self.entry.data[CONF_ADDRESS]), self.entry.entry_id
-        )
-        if device is not None:
-            registry.async_update_device(
-                device.id,
-                model_id=snapshot.info.model_id,
-                # Clear an old recognized version if a new signature is unknown.
-                sw_version=snapshot.info.firmware_version,
-            )
+        identifier = (DOMAIN, self.entry.data[CONF_ADDRESS])
+        for device in dr.async_entries_for_config_entry(registry, self.entry.entry_id):
+            if identifier in device.identifiers:
+                registry.async_update_device(
+                    device.id,
+                    model_id=snapshot.info.model_id,
+                    # Clear an old recognized version if a new signature is unknown.
+                    sw_version=snapshot.info.firmware_version,
+                )
+                break
 
     async def async_write(self, method: str, *args) -> Snapshot:
         async with self._io_lock:

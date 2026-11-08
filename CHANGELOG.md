@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Lower the minimum Home Assistant version to 2026.1.0 and test it alongside
+  the recent Home Assistant test environment.
+
 ## 0.1.2 — 2026-10-29
 
 - Remove the duplicate read-only long-press sensors. View and change long-press

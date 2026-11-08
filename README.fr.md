@@ -29,8 +29,9 @@ pas d’événements d’appui utilisables dans les automatisations Home Assista
 - Écouteurs Redmi Buds 6 Play déjà appairés à cet adaptateur.
 
 Les proxys Bluetooth BLE ESPHome ne prennent pas en charge cette connexion.
-Seul le modèle Redmi Buds 6 Play est pris en charge. L’environnement logiciel
-utilisé pour les tests est indiqué dans [VALIDATION.md](docs/VALIDATION.md).
+Seul le modèle Redmi Buds 6 Play est pris en charge. Home Assistant 2026.1.0
+ou une version ultérieure est requis. Les versions testées sont indiquées
+dans [VALIDATION.md](docs/VALIDATION.md).
 
 ## Installation avec HACS
 

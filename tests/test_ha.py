@@ -7,13 +7,12 @@ from dataclasses import replace
 from datetime import timedelta
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import probatio
 import pytest
 from homeassistant.config_entries import SOURCE_USER, ConfigEntryDisabler
 from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers.data_entry_flow import FlowManagerIndexView
 from homeassistant.util import dt as dt_util
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
@@ -386,9 +385,8 @@ async def test_refresh_options_serialize_to_a_visible_number_input(hass, client)
     entry = await setup(hass, client)
     result = await hass.config_entries.options.async_init(entry.entry_id)
     # Check the form schema as serialized for the frontend.
-    fields = probatio.to_field_list(
-        result["data_schema"], custom_serializer=cv.custom_serializer
-    )
+    view = FlowManagerIndexView(hass.config_entries.options)
+    fields = view._prepare_result_json(result)["data_schema"]
     field = next(item for item in fields if item["name"] == "poll_interval_minutes")
     assert field["default"] == 0
     number = field["selector"]["number"]
@@ -412,7 +410,8 @@ async def test_firmware_sensor_and_device_metadata_clear_unknown_version(
     assert state.state == "2.0.2.2"
     assert state.attributes["firmware_raw"] == "20222022"
     registry = dr.async_get(hass)
-    device = registry.async_get_device_by_identifier((DOMAIN, ADDRESS), entry.entry_id)
+    registered_sensor = er.async_get(hass).async_get(entity_id)
+    device = registry.async_get(registered_sensor.device_id)
     assert device.model_id == "M2420E1"
     assert device.sw_version == "2.0.2.2"
 

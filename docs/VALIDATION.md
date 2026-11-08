@@ -2,15 +2,14 @@
 
 ## Test environment
 
-- CPython 3.14.8.
-- Home Assistant 2026.10.2.
-- `pytest-homeassistant-custom-component==0.13.373`.
-- `pytest-cov==7.1.0`.
-- Ruff 0.17.1.
+| CI job | Python | Home Assistant | Test harness |
+| --- | --- | --- | --- |
+| Minimum Home Assistant compatibility | 3.13 | 2026.1.0 | 0.13.305 |
+| Tests and coverage | 3.14 | 2026.10.4 | 0.13.375 |
 
-The test suite passes **54 tests and 29 subtests**, with **89% coverage**
-including branches. Ruff lint and formatting checks pass. Bluetooth sockets
-and earphones are simulated; Home Assistant runs in the test environment.
+The same suite runs in both jobs. The recent job uses the versions pinned in
+`requirements_test.txt` and measures branch coverage. Bluetooth sockets and
+earphones are simulated; the minimum job does not verify a physical Bluetooth setup.
 
 ## Run checks
 
