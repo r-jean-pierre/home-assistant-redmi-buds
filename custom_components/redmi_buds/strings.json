@@ -27,6 +27,7 @@
     },
     "error": {
       "invalid_address": "Enter a valid MAC address.",
+      "invalid_channel": "Choose a whole number from 1 to 30 for the RFCOMM channel.",
       "cannot_connect": "Cannot connect. Check pairing, the open case, local Bluetooth and the phone connection.",
       "unsupported_device": "Only Redmi Buds 6 Play are supported.",
       "unsupported_transport": "This Python platform does not provide Bluetooth classic RFCOMM sockets.",

@@ -5,4 +5,3 @@ NAME = "Redmi Buds 6 Play"
 CONF_ADDRESS = "address"
 CONF_CHANNEL = "channel"
 CONF_INTERVAL = "poll_interval_minutes"
-DEFAULT_CHANNEL = 6
