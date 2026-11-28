@@ -91,8 +91,10 @@ particularly **Take photo**, may also affect another gesture. According to
 Xiaomi Earbuds, the photo feature requires a compatible Xiaomi HyperOS phone
 and is unavailable with dual connection.
 
-If a write returns an error, **refresh before trying again**. The setting
-may have changed even if its confirmation was not received.
+If the earphones reject a change, Home Assistant reports the error and keeps
+the last available readings. If communication fails or the change cannot be
+confirmed, **refresh before trying again**. A change without confirmation may
+already have taken effect.
 
 ## Audio settings
 
