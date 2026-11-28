@@ -69,7 +69,9 @@ class LastReadSensor(BudsEntity, SensorEntity):
 
     @property
     def available(self):
-        return self.coordinator.last_success is not None
+        return (
+            not self.coordinator.stopped and self.coordinator.last_success is not None
+        )
 
     @property
     def native_value(self):

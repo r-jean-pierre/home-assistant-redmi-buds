@@ -60,6 +60,12 @@ class Session:
         self._expires = clock() + 30
         self._parser = StreamParser()
 
+    def _send(self, data: bytes) -> None:
+        try:
+            self.socket.sendall(data)
+        except socket.timeout as err:
+            raise RequestTimeout("MMA send deadline elapsed") from err
+
     def request(self, opcode: int, payload: bytes) -> bytes:
         sequence = self._next_sequence()
         deadline = min(self._expires, self._clock() + 5)
@@ -67,7 +73,7 @@ class Session:
         if remaining <= 0:
             raise RequestTimeout("MMA session deadline elapsed")
         self.socket.settimeout(remaining)
-        self.socket.sendall(encode_request(opcode, sequence, payload))
+        self._send(encode_request(opcode, sequence, payload))
         while True:
             remaining = deadline - self._clock()
             if remaining <= 0:
@@ -90,7 +96,7 @@ class Session:
                         self.socket.settimeout(
                             max(0.001, min(1, deadline - self._clock()))
                         )
-                        self.socket.sendall(encode_reply(frame, status))
+                        self._send(encode_reply(frame, status))
                     continue
                 if frame.opcode == opcode and frame.sequence == sequence:
                     matched = frame

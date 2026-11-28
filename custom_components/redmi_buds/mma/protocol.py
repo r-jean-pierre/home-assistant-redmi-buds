@@ -35,7 +35,7 @@ class IncompatibleDevice(BudsError):
 
 
 class RequestTimeout(BudsError):
-    """The bounded response deadline elapsed."""
+    """A protocol send, response or session deadline elapsed."""
 
 
 class DeviceRejected(BudsError):
