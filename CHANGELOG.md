@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.4 — 2026-11-28
 
 - Keep the last available readings when a settings change is rejected.
 - Keep manual setup inputs after an error. Reconfiguration changes only the
