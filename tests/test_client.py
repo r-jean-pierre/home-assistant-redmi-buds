@@ -34,6 +34,13 @@ class ClientTests(unittest.TestCase):
         self.assertEqual(sock.connect_timeout, 15)
         self.assertTrue(sock.closed)
 
+    def test_serial_with_only_padding_is_missing(self):
+        sock = FakeSocket()
+        sock.config[0x27] = b"\x00" * 8
+        snapshot = self.client(sock).read()
+        self.assertIsNone(snapshot.serial)
+        self.assertEqual(snapshot.info.batteries[0].level, 100)
+
     def test_notification_before_ack_not_matching_reply(self):
         sock = FakeSocket()
         client = self.client(sock)
@@ -111,21 +118,36 @@ class ClientTests(unittest.TestCase):
         self.assertEqual(len([f for f in sock.sent if f.opcode == 0xF2]), 1)
         self.assertTrue(sock.closed)
 
-    def test_applied_write_with_lost_ack_is_unconfirmed(self):
+    def test_applied_write_without_confirmation_is_not_retried(self):
         class LostAckSocket(FakeSocket):
+            def __init__(self, failure):
+                super().__init__()
+                self.failure = failure
+
             def sendall(self, data):
                 frame = StreamParser().feed(data)[0]
                 super().sendall(data)
                 if frame.is_request and frame.opcode == SET_CONFIG:
-                    self.pending.clear()
+                    if self.failure == "ack_lost":
+                        self.pending.clear()
+                    elif self.failure == "write_send_timeout":
+                        raise socket.timeout("Write send timed out")
+                if not frame.is_request and self.failure == "reply_send_timeout":
+                    raise socket.timeout("Notification reply timed out")
 
-        sock = LostAckSocket()
-        with self.assertRaises(WriteUnconfirmed) as caught:
-            self.client(sock).set_config(7, 0)
-        self.assertIsInstance(caught.exception.__cause__, ConnectionError)
-        self.assertEqual(sock.config[7], b"\x00")
-        self.assertEqual(sum(f.opcode == SET_CONFIG for f in sock.sent), 1)
-        self.assertTrue(sock.closed)
+        for failure, cause in (
+            ("ack_lost", ConnectionError),
+            ("write_send_timeout", RequestTimeout),
+            ("reply_send_timeout", RequestTimeout),
+        ):
+            with self.subTest(failure=failure):
+                sock = LostAckSocket(failure)
+                with self.assertRaises(WriteUnconfirmed) as caught:
+                    self.client(sock).set_config(7, 0)
+                self.assertIsInstance(caught.exception.__cause__, cause)
+                self.assertEqual(sock.config[7], b"\x00")
+                self.assertEqual(sum(f.opcode == SET_CONFIG for f in sock.sent), 1)
+                self.assertTrue(sock.closed)
 
     def test_readback_failure_after_accepted_write_is_unconfirmed(self):
         class ReadbackFailureSocket(FakeSocket):
@@ -195,6 +217,16 @@ class ClientTests(unittest.TestCase):
         sock = FakeSocket()
         sock.connect_error = True
         with self.assertRaises(ConnectionError):
+            self.client(sock).read()
+        self.assertTrue(sock.closed)
+
+    def test_read_send_timeout_closes_socket(self):
+        class SendTimeoutSocket(FakeSocket):
+            def sendall(self, data):
+                raise socket.timeout("Read send timed out")
+
+        sock = SendTimeoutSocket()
+        with self.assertRaises(RequestTimeout):
             self.client(sock).read()
         self.assertTrue(sock.closed)
 

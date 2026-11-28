@@ -124,7 +124,7 @@ def decode_serial(value: bytes | None) -> str | None:
     if value is None:
         return None
     try:
-        return value.rstrip(b"\x00").decode("ascii")
+        return value.rstrip(b"\x00").decode("ascii") or None
     except UnicodeDecodeError as err:
         raise ProtocolError("Invalid serial number encoding") from err
 
