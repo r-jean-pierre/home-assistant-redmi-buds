@@ -6,7 +6,11 @@ import re
 from typing import Any
 
 import voluptuous as vol
-from homeassistant.config_entries import ConfigFlow, ConfigFlowResult, OptionsFlow
+from homeassistant.config_entries import (
+    ConfigFlow,
+    ConfigFlowResult,
+    OptionsFlowWithReload,
+)
 from homeassistant.core import callback
 from homeassistant.helpers.selector import (
     NumberSelector,
@@ -26,23 +30,21 @@ from .mma import BudsClient, BudsError
 from .mma.bluez import DiscoveryUnavailable, PairedDevice, async_list_paired_devices
 from .mma.protocol import IncompatibleDevice, UnsupportedTransport
 
+RFCOMM_CHANNEL = vol.All(vol.Coerce(int), vol.Range(min=1, max=30))
+MANUAL_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_ADDRESS, default=""): str,
+        vol.Required(CONF_CHANNEL, default=DEFAULT_CHANNEL): RFCOMM_CHANNEL,
+    }
+)
+RECONFIGURE_SCHEMA = vol.Schema({vol.Required(CONF_CHANNEL): RFCOMM_CHANNEL})
+
 
 def normalize_address(value: str) -> str:
     address = value.strip().replace("-", ":").upper()
     if not re.fullmatch(r"(?:[0-9A-F]{2}:){5}[0-9A-F]{2}", address):
         raise ValueError("Invalid Bluetooth MAC address")
     return address
-
-
-def schema(address: str = "", channel: int = DEFAULT_CHANNEL) -> vol.Schema:
-    return vol.Schema(
-        {
-            vol.Required(CONF_ADDRESS, default=address): str,
-            vol.Required(CONF_CHANNEL, default=channel): vol.All(
-                vol.Coerce(int), vol.Range(min=1, max=30)
-            ),
-        }
-    )
 
 
 class BudsConfigFlow(ConfigFlow, domain=DOMAIN):
@@ -161,44 +163,36 @@ class BudsConfigFlow(ConfigFlow, domain=DOMAIN):
                 else:
                     return self.async_create_entry(title=NAME, data=data)
         return self.async_show_form(
-            step_id="manual", data_schema=schema(), errors=errors
+            step_id="manual",
+            data_schema=self.add_suggested_values_to_schema(MANUAL_SCHEMA, user_input),
+            errors=errors,
         )
 
     async def async_step_reconfigure(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         entry = self._get_reconfigure_entry()
+        channel = entry.data.get(CONF_CHANNEL, DEFAULT_CHANNEL)
         errors = {}
         if user_input is not None:
-            try:
-                address = normalize_address(user_input[CONF_ADDRESS])
-            except ValueError:
-                errors[CONF_ADDRESS] = "invalid_address"
+            channel = user_input[CONF_CHANNEL]
+            data = {CONF_ADDRESS: entry.data[CONF_ADDRESS], CONF_CHANNEL: channel}
+            if error := await self._validate(data):
+                errors["base"] = error
             else:
-                # Changing the address requires a separate config entry.
-                if address != entry.data[CONF_ADDRESS]:
-                    errors[CONF_ADDRESS] = "different_device"
-                else:
-                    data = {
-                        CONF_ADDRESS: address,
-                        CONF_CHANNEL: user_input[CONF_CHANNEL],
-                    }
-                    if error := await self._validate(data):
-                        errors["base"] = error
-                    else:
-                        return self.async_update_reload_and_abort(
-                            entry, data_updates=data
-                        )
+                return self.async_update_reload_and_abort(
+                    entry, data_updates={CONF_CHANNEL: channel}
+                )
         return self.async_show_form(
             step_id="reconfigure",
-            data_schema=schema(
-                entry.data[CONF_ADDRESS], entry.data.get(CONF_CHANNEL, DEFAULT_CHANNEL)
+            data_schema=self.add_suggested_values_to_schema(
+                RECONFIGURE_SCHEMA, {CONF_CHANNEL: channel}
             ),
             errors=errors,
         )
 
 
-class BudsOptionsFlow(OptionsFlow):
+class BudsOptionsFlow(OptionsFlowWithReload):
     async def async_step_init(self, user_input=None) -> ConfigFlowResult:
         errors = {}
         if user_input is not None:

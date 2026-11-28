@@ -13,7 +13,6 @@
         "title": "Redmi Buds 6 Play",
         "description": "Modifiez le canal RFCOMM de cet appareil. La validation ouvre une connexion.",
         "data": {
-          "address": "Adresse Bluetooth (MAC)",
           "channel": "Canal RFCOMM"
         }
       },
@@ -28,7 +27,6 @@
     },
     "error": {
       "invalid_address": "Saisissez une adresse MAC valide.",
-      "different_device": "Pour une autre adresse MAC, ajoutez une nouvelle intégration.",
       "cannot_connect": "Connexion impossible. Vérifiez l’appairage, le boîtier ouvert, le Bluetooth local et la connexion du téléphone.",
       "unsupported_device": "Seuls les Redmi Buds 6 Play sont pris en charge.",
       "unsupported_transport": "Cette plateforme Python ne fournit pas de socket Bluetooth classique RFCOMM.",

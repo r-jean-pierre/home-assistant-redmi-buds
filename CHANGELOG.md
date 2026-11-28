@@ -3,6 +3,8 @@
 ## Unreleased
 
 - Keep the last available readings when a settings change is rejected.
+- Keep manual setup inputs after an error. Reconfiguration changes only the
+  RFCOMM channel and saves it after a successful connection.
 
 ## 0.1.3 — 2026-11-08
 
