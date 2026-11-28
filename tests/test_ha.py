@@ -23,7 +23,9 @@ from custom_components.redmi_buds.mma.bluez import DiscoveryUnavailable, PairedD
 from custom_components.redmi_buds.mma.client import BudsClient
 from custom_components.redmi_buds.mma.protocol import (
     ConnectionError,
+    DeviceRejected,
     IncompatibleDevice,
+    WriteUnconfirmed,
 )
 
 from .support import ADDRESS, FakeSocket
@@ -159,6 +161,40 @@ async def test_writes_publish_full_readback_and_mismatch(hass, client, snapshot)
             {"entity_id": eid(hass, "select", "equalizer"), "option": "voice"},
             blocking=True,
         )
+
+
+@pytest.mark.parametrize(
+    ("failure", "battery_state", "latency_state"),
+    [
+        (DeviceRejected("Change rejected"), "100", "on"),
+        (ValueError("Unsupported change"), "100", "on"),
+        (
+            WriteUnconfirmed("Change could not be confirmed"),
+            "unavailable",
+            "unavailable",
+        ),
+        (ConnectionError("Connection lost"), "unavailable", "unavailable"),
+    ],
+)
+async def test_failed_write_preserves_readings_only_if_rejected(
+    hass, client, failure, battery_state, latency_state
+):
+    entry = await setup(hass, client)
+    await entry.runtime_data.async_refresh()
+    last_read = eid(hass, "sensor", "last_read")
+    timestamp = hass.states.get(last_read).state
+    latency = eid(hass, "switch", "low_latency")
+    client.set_config.side_effect = failure
+
+    with pytest.raises(HomeAssistantError, match=str(failure)):
+        await hass.services.async_call(
+            "switch", "turn_off", {"entity_id": latency}, blocking=True
+        )
+
+    client.set_config.assert_called_once()
+    assert hass.states.get(eid(hass, "sensor", "battery_left")).state == battery_state
+    assert hass.states.get(latency).state == latency_state
+    assert hass.states.get(last_read).state == timestamp
 
 
 async def test_long_press_controls_and_coupled_readback(hass, client, snapshot):

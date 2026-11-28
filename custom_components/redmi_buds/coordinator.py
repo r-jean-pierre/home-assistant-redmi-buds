@@ -14,6 +14,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 
 from .const import CONF_ADDRESS, CONF_INTERVAL, DOMAIN
 from .mma import BudsClient, BudsError, Snapshot
+from .mma.protocol import DeviceRejected
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -71,7 +72,9 @@ class BudsCoordinator(DataUpdateCoordinator[Snapshot | None]):
                 snapshot = await self.hass.async_add_executor_job(
                     getattr(self.client, method), *args
                 )
-            except (BudsError, ValueError) as err:
+            except (DeviceRejected, ValueError) as err:
+                raise HomeAssistantError(str(err)) from err
+            except BudsError as err:
                 self.async_set_update_error(UpdateFailed(str(err)))
                 raise HomeAssistantError(str(err)) from err
             self.last_success = snapshot.observed_at

@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Keep the last available readings when a settings change is rejected.
+
 ## 0.1.3 — 2026-11-08
 
 - Lower the minimum Home Assistant version to 2026.1.0 and test it alongside
