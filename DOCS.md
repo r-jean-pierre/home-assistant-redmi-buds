@@ -38,6 +38,10 @@ Manual address entry is available if the list is empty or unavailable.
 The default RFCOMM channel is **6**. The integration checks the product
 identifier when connecting; a matching Bluetooth name alone is not sufficient.
 
+Use **Reconfigure** on an existing entry to change the RFCOMM channel. The
+integration tests the connection before saving. To connect a different pair
+of earphones, add a separate entry.
+
 ## Read measurements
 
 Press **Refresh** on the device page to read batteries, charging status and

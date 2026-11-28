@@ -8,7 +8,12 @@ from datetime import timedelta
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from homeassistant.config_entries import SOURCE_USER, ConfigEntryDisabler
+from homeassistant.config_entries import (
+    SOURCE_RECONFIGURE,
+    SOURCE_USER,
+    ConfigEntryDisabler,
+)
+from homeassistant.data_entry_flow import InvalidData
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
@@ -383,19 +388,80 @@ async def test_flow_validation_and_duplicate(hass, client):
 
 
 @pytest.mark.parametrize(
-    "address,error", [("bad", "invalid_address"), (ADDRESS, "unsupported_device")]
+    ("address", "probe_failure", "error"),
+    [
+        ("bad", None, "invalid_address"),
+        (ADDRESS, IncompatibleDevice("unsupported"), "unsupported_device"),
+        ("aa-bb-cc-dd-ee-01", ConnectionError("offline"), "cannot_connect"),
+    ],
 )
-async def test_flow_errors(hass, client, address, error):
-    client.probe.side_effect = IncompatibleDevice("unsupported")
+async def test_manual_setup_keeps_input_after_an_error(
+    hass, client, address, probe_failure, error
+):
+    client.probe.side_effect = probe_failure
+    flow = hass.config_entries.flow
+    submitted = {"address": address, "channel": 7}
     with patch(
         "custom_components.redmi_buds.config_flow.BudsClient", return_value=client
     ):
-        result = await hass.config_entries.flow.async_init(
-            DOMAIN,
-            context={"source": SOURCE_USER},
-            data={"address": address, "channel": 6},
-        )
+        result = await flow.async_init(DOMAIN, context={"source": SOURCE_USER})
+        result = await flow.async_configure(result["flow_id"], submitted)
     assert error in result["errors"].values()
+    fields = FlowManagerIndexView(flow)._prepare_result_json(result)["data_schema"]
+    assert {
+        field["name"]: field["description"]["suggested_value"] for field in fields
+    } == submitted
+
+
+async def test_reconfigure_changes_only_channel_after_successful_probe(hass, client):
+    entry = await setup(hass, client)
+    coordinator = entry.runtime_data
+    flow = hass.config_entries.flow
+    view = FlowManagerIndexView(flow)
+    probe = MagicMock(spec=BudsClient)
+    probe.probe.side_effect = ConnectionError("offline")
+
+    with patch(
+        "custom_components.redmi_buds.config_flow.BudsClient", return_value=probe
+    ) as probe_client:
+        result = await flow.async_init(
+            DOMAIN, context={"source": SOURCE_RECONFIGURE, "entry_id": entry.entry_id}
+        )
+        assert result["type"] == "form"
+        fields = view._prepare_result_json(result)["data_schema"]
+        assert [field["name"] for field in fields] == ["channel"]
+        assert fields[0]["description"]["suggested_value"] == 6
+
+        for invalid in (
+            {"channel": 31},
+            {"address": "AA:BB:CC:DD:EE:99", "channel": 7},
+        ):
+            with pytest.raises(InvalidData):
+                await flow.async_configure(result["flow_id"], invalid)
+        probe_client.assert_not_called()
+
+        result = await flow.async_configure(result["flow_id"], {"channel": 7})
+        assert result["errors"] == {"base": "cannot_connect"}
+        fields = view._prepare_result_json(result)["data_schema"]
+        assert fields[0]["description"]["suggested_value"] == 7
+        probe_client.assert_called_once_with(ADDRESS, 7)
+        assert entry.data == {"address": ADDRESS, "channel": 6}
+        assert entry.runtime_data is coordinator
+
+        probe.probe.side_effect = None
+        with patch(
+            "custom_components.redmi_buds.BudsClient", return_value=client
+        ) as runtime_client:
+            result = await flow.async_configure(result["flow_id"], {"channel": 7})
+            await hass.async_block_till_done()
+        runtime_client.assert_called_once_with(ADDRESS, 7)
+
+    assert result["type"] == "abort"
+    assert result["reason"] == "reconfigure_successful"
+    assert hass.config_entries.async_entries(DOMAIN) == [entry]
+    assert entry.unique_id == ADDRESS
+    assert entry.data == {"address": ADDRESS, "channel": 7}
+    assert entry.runtime_data is not coordinator
 
 
 async def test_options_enable_periodic_refresh_and_reject_short_interval(hass, client):

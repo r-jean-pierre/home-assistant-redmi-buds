@@ -28,21 +28,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: BudsConfigEntry) -> bool
     )
     coordinator = coordinator_module.BudsCoordinator(hass, entry, client)
     entry.runtime_data = coordinator
-    # Manual mode waits for an explicit refresh before connecting.
-    entry.async_on_unload(entry.add_update_listener(_async_options_updated))
 
     async def stop(_event) -> None:
         await coordinator.async_stop()
 
     entry.async_on_unload(hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, stop))
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    # Manual mode waits for an explicit refresh before connecting.
     if entry.options.get(CONF_INTERVAL, 0):
         await coordinator.async_refresh()
     return True
-
-
-async def _async_options_updated(hass: HomeAssistant, entry: BudsConfigEntry) -> None:
-    await hass.config_entries.async_reload(entry.entry_id)
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: BudsConfigEntry) -> bool:
