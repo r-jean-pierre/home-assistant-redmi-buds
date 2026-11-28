@@ -17,15 +17,17 @@ With Python 3.14, from the repository root:
 
 ```bash
 python -m pip install -r requirements_test.txt
-python -m pytest -q --cov=custom_components.redmi_buds --cov=mma --cov-report=term-missing
+python -m pytest -q --cov --cov-report=term-missing
 python -m ruff check .
 python -m ruff format --check .
 ```
 
-The standalone protocol, client and discovery tests also support Python 3.12+:
+The standalone protocol, client and discovery tests run without Home
+Assistant. CI also checks that the Bluetooth probe starts on Python 3.12:
 
 ```bash
 python3 -m unittest tests.test_protocol tests.test_client tests.test_discovery -v
+python3 scripts/probe_core.py --help
 ```
 
 ## Coverage

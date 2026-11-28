@@ -23,7 +23,7 @@ python -m ruff format --check .
 Measure coverage:
 
 ```bash
-python -m pytest --cov=custom_components.redmi_buds --cov=mma --cov-report=term-missing
+python -m pytest --cov --cov-report=term-missing
 ```
 
 Bluetooth is simulated in automated tests. Describe hardware checks separately,
@@ -45,6 +45,8 @@ Pushes and pull requests run the same integration tests on the declared
 minimum Home Assistant version and on the recent version pinned in
 `requirements_test.txt`. The recent job also measures coverage. Ruff and
 Hassfest run separately, and HACS validation runs for public repositories.
+The standalone tests and Bluetooth probe startup are checked without Home
+Assistant on Python 3.12.
 A weekly, non-blocking job checks the latest available Home Assistant test harness.
 
 ## Releases

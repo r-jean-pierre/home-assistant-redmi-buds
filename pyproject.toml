@@ -4,7 +4,7 @@ testpaths = ["tests"]
 
 [tool.coverage.run]
 branch = true
-source = ["custom_components.redmi_buds", "mma"]
+source = ["custom_components.redmi_buds"]
 
 [tool.coverage.report]
 show_missing = true

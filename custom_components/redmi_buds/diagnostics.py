@@ -2,8 +2,8 @@
 
 from homeassistant.core import HomeAssistant
 
-from . import BudsConfigEntry
 from .const import CONF_CHANNEL, CONF_INTERVAL, DEFAULT_CHANNEL
+from .coordinator import BudsConfigEntry
 
 
 async def async_get_config_entry_diagnostics(

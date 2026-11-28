@@ -1,6 +1,6 @@
 """Deterministic socket simulator. All addresses and serials are synthetic."""
 
-from mma.protocol import StreamParser, config_payload
+from custom_components.redmi_buds.mma.protocol import StreamParser, config_payload
 
 ADDRESS = "AA:BB:CC:DD:EE:01"
 INFO = bytes.fromhex(

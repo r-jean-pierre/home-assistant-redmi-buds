@@ -2,7 +2,7 @@
 
 import unittest
 
-from mma.bluez import parse_paired_devices
+from custom_components.redmi_buds.mma.bluez import parse_paired_devices
 
 
 class DiscoveryTests(unittest.TestCase):

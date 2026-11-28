@@ -91,3 +91,6 @@ class BudsCoordinator(DataUpdateCoordinator[Snapshot | None]):
         # Wait for any executor operation to unwind before completing unload.
         async with self._io_lock:
             pass
+
+
+type BudsConfigEntry = ConfigEntry[BudsCoordinator]
