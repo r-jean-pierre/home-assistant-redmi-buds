@@ -1,8 +1,13 @@
 import unittest
 from dataclasses import replace
 
-from mma.model import battery, config_value, decode_gestures, decode_info
-from mma.protocol import (
+from custom_components.redmi_buds.mma.model import (
+    battery,
+    config_value,
+    decode_gestures,
+    decode_info,
+)
+from custom_components.redmi_buds.mma.protocol import (
     ProtocolError,
     StreamParser,
     decode_blocks,

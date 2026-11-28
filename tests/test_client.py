@@ -3,8 +3,8 @@ import threading
 import unittest
 from concurrent.futures import ThreadPoolExecutor
 
-from mma.client import BudsClient, Session
-from mma.protocol import (
+from custom_components.redmi_buds.mma.client import BudsClient, Session
+from custom_components.redmi_buds.mma.protocol import (
     GET_CONFIG,
     GET_INFO,
     SET_CONFIG,

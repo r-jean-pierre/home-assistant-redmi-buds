@@ -7,12 +7,16 @@ import sys
 import time
 from pathlib import Path
 
-component = Path(__file__).resolve().parents[1] / "custom_components" / "redmi_buds"
-if not component.is_dir():
-    component = Path("/config/custom_components/redmi_buds")
-sys.path.insert(0, str(component))
-from mma import BudsClient, BudsError  # noqa: E402
-from mma.model import ACTIONS, EQ_PROFILES, label_for  # noqa: E402
+root = Path(__file__).resolve().parents[1]
+if not (root / "custom_components" / "redmi_buds").is_dir():
+    root = Path("/config")
+sys.path.insert(0, str(root))
+from custom_components.redmi_buds.mma import BudsClient, BudsError  # noqa: E402
+from custom_components.redmi_buds.mma.model import (  # noqa: E402
+    ACTIONS,
+    EQ_PROFILES,
+    label_for,
+)
 
 
 def main():

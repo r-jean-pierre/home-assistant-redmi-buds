@@ -22,7 +22,18 @@ jobs:
           cache: pip
           cache-dependency-path: requirements_test.txt
       - run: python -m pip install -r requirements_test.txt
-      - run: python -m pytest -q --cov=custom_components.redmi_buds --cov=mma --cov-report=term-missing --cov-report=xml
+      - run: python -m pytest -q --cov --cov-report=term-missing --cov-report=xml
+
+  standalone:
+    name: Standalone tools
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - run: python -m unittest tests.test_protocol tests.test_client tests.test_discovery -v
+      - run: python scripts/probe_core.py --help
 
   minimum-home-assistant:
     name: Minimum Home Assistant compatibility
