@@ -5,8 +5,9 @@ from __future__ import annotations
 from importlib import import_module
 from typing import TYPE_CHECKING
 
-from .const import CONF_ADDRESS, CONF_CHANNEL, CONF_INTERVAL, DEFAULT_CHANNEL
+from .const import CONF_ADDRESS, CONF_CHANNEL, CONF_INTERVAL
 from .mma import BudsClient
+from .mma.connection import DEFAULT_CHANNEL, InvalidAddress, InvalidChannel
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
@@ -18,13 +19,17 @@ PLATFORMS = ("sensor", "binary_sensor", "switch", "select", "button")
 
 async def async_setup_entry(hass: HomeAssistant, entry: BudsConfigEntry) -> bool:
     from homeassistant.const import EVENT_HOMEASSISTANT_STOP
+    from homeassistant.exceptions import ConfigEntryError
 
+    try:
+        client = BudsClient(
+            entry.data[CONF_ADDRESS], entry.data.get(CONF_CHANNEL, DEFAULT_CHANNEL)
+        )
+    except (InvalidAddress, InvalidChannel) as err:
+        raise ConfigEntryError(str(err)) from err
     # The protocol can be imported without Home Assistant.
     coordinator_module = await hass.async_add_import_executor_job(
         import_module, f"{__name__}.coordinator"
-    )
-    client = BudsClient(
-        entry.data[CONF_ADDRESS], entry.data.get(CONF_CHANNEL, DEFAULT_CHANNEL)
     )
     coordinator = coordinator_module.BudsCoordinator(hass, entry, client)
     entry.runtime_data = coordinator

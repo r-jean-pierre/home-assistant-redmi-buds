@@ -2,8 +2,10 @@ import socket
 import threading
 import unittest
 from concurrent.futures import ThreadPoolExecutor
+from unittest.mock import Mock
 
 from custom_components.redmi_buds.mma.client import BudsClient, Session
+from custom_components.redmi_buds.mma.connection import InvalidAddress, InvalidChannel
 from custom_components.redmi_buds.mma.protocol import (
     GET_CONFIG,
     GET_INFO,
@@ -50,6 +52,25 @@ class ClientTests(unittest.TestCase):
         self.assertEqual(len(replies), 1)
         self.assertEqual((replies[0].opcode, replies[0].status), (0xF4, 0))
         self.assertEqual(len([f for f in sock.sent if f.opcode == 0xF2]), 1)
+
+    def test_connection_uses_normalized_mac_and_accepts_channel_limits(self):
+        for address, channel in ((" aa-bb-cc-dd-ee-01 ", 1), (ADDRESS.lower(), 30)):
+            with self.subTest(channel=channel):
+                sock = FakeSocket()
+                BudsClient(address, channel, socket_factory=lambda: sock).probe()
+                self.assertEqual(sock.target, (ADDRESS, channel))
+
+    def test_invalid_connection_settings_fail_before_creating_socket(self):
+        factory = Mock()
+        cases = [("not-a-mac", 6, InvalidAddress), (None, 6, InvalidAddress)]
+        cases += [
+            (ADDRESS, channel, InvalidChannel) for channel in (0, 31, True, 6.5, "6")
+        ]
+        for address, channel, error in cases:
+            with self.subTest(address=address, channel=channel):
+                with self.assertRaises(error):
+                    BudsClient(address, channel, socket_factory=factory).probe()
+                factory.assert_not_called()
 
     def test_gesture_read_modify_write_preserves_other_side(self):
         sock = FakeSocket()

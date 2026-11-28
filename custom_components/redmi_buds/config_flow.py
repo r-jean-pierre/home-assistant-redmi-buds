@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import re
 from typing import Any
 
 import voluptuous as vol
@@ -22,15 +21,23 @@ from .const import (
     CONF_ADDRESS,
     CONF_CHANNEL,
     CONF_INTERVAL,
-    DEFAULT_CHANNEL,
     DOMAIN,
     NAME,
 )
 from .mma import BudsClient, BudsError
 from .mma.bluez import DiscoveryUnavailable, PairedDevice, async_list_paired_devices
+from .mma.connection import (
+    DEFAULT_CHANNEL,
+    RFCOMM_CHANNELS,
+    InvalidAddress,
+    InvalidChannel,
+    normalize_address,
+)
 from .mma.protocol import IncompatibleDevice, UnsupportedTransport
 
-RFCOMM_CHANNEL = vol.All(vol.Coerce(int), vol.Range(min=1, max=30))
+RFCOMM_CHANNEL = vol.All(
+    int, vol.Range(min=RFCOMM_CHANNELS.start, max=RFCOMM_CHANNELS.stop - 1)
+)
 MANUAL_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_ADDRESS, default=""): str,
@@ -38,13 +45,6 @@ MANUAL_SCHEMA = vol.Schema(
     }
 )
 RECONFIGURE_SCHEMA = vol.Schema({vol.Required(CONF_CHANNEL): RFCOMM_CHANNEL})
-
-
-def normalize_address(value: str) -> str:
-    address = value.strip().replace("-", ":").upper()
-    if not re.fullmatch(r"(?:[0-9A-F]{2}:){5}[0-9A-F]{2}", address):
-        raise ValueError("Invalid Bluetooth MAC address")
-    return address
 
 
 class BudsConfigFlow(ConfigFlow, domain=DOMAIN):
@@ -60,7 +60,12 @@ class BudsConfigFlow(ConfigFlow, domain=DOMAIN):
         return BudsOptionsFlow()
 
     async def _validate(self, data: dict) -> str | None:
-        client = BudsClient(data[CONF_ADDRESS], data[CONF_CHANNEL])
+        try:
+            client = BudsClient(data[CONF_ADDRESS], data[CONF_CHANNEL])
+        except InvalidAddress:
+            return "invalid_address"
+        except InvalidChannel:
+            return "invalid_channel"
         try:
             await self.hass.async_add_executor_job(client.probe)
         except IncompatibleDevice:
@@ -153,7 +158,7 @@ class BudsConfigFlow(ConfigFlow, domain=DOMAIN):
                     CONF_ADDRESS: normalize_address(user_input[CONF_ADDRESS]),
                     CONF_CHANNEL: user_input[CONF_CHANNEL],
                 }
-            except ValueError:
+            except InvalidAddress:
                 errors[CONF_ADDRESS] = "invalid_address"
             else:
                 await self.async_set_unique_id(data[CONF_ADDRESS])

@@ -7,6 +7,7 @@
   RFCOMM channel and saves it after a successful connection.
 - Report a serial number containing only padding as unknown.
 - Distinguish Bluetooth send timeouts from other connection errors.
+- Validate the Bluetooth address and RFCOMM channel before connecting.
 
 ## 0.1.3 — 2026-11-08
 

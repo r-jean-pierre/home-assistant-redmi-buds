@@ -12,6 +12,7 @@ from homeassistant.config_entries import (
     SOURCE_RECONFIGURE,
     SOURCE_USER,
     ConfigEntryDisabler,
+    ConfigEntryState,
 )
 from homeassistant.data_entry_flow import InvalidData
 from homeassistant.exceptions import HomeAssistantError
@@ -413,6 +414,29 @@ async def test_manual_setup_keeps_input_after_an_error(
     } == submitted
 
 
+async def test_manual_setup_rejects_a_boolean_channel_before_the_probe(hass):
+    flow = hass.config_entries.flow
+    with patch.object(BudsClient, "probe") as probe:
+        result = await flow.async_init(DOMAIN, context={"source": SOURCE_USER})
+        result = await flow.async_configure(
+            result["flow_id"], {"address": ADDRESS, "channel": True}
+        )
+    assert result["errors"] == {"base": "invalid_channel"}
+    probe.assert_not_called()
+
+
+async def test_invalid_saved_channel_reports_config_entry_error(hass):
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        unique_id=ADDRESS,
+        data={"address": ADDRESS, "channel": 31},
+    )
+    entry.add_to_hass(hass)
+    await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+    assert entry.state is ConfigEntryState.SETUP_ERROR
+
+
 async def test_reconfigure_changes_only_channel_after_successful_probe(hass, client):
     entry = await setup(hass, client)
     coordinator = entry.runtime_data
@@ -434,6 +458,7 @@ async def test_reconfigure_changes_only_channel_after_successful_probe(hass, cli
 
         for invalid in (
             {"channel": 31},
+            {"channel": 6.5},
             {"address": "AA:BB:CC:DD:EE:99", "channel": 7},
         ):
             with pytest.raises(InvalidData):

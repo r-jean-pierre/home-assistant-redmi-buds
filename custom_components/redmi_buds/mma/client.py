@@ -10,6 +10,7 @@ from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from datetime import UTC, datetime
 
+from .connection import DEFAULT_CHANNEL, normalize_address, validate_channel
 from .model import (
     CONFIG_EQ,
     CONFIG_GESTURES,
@@ -115,10 +116,14 @@ class BudsClient:
     """One socket per operation; serialize even if an awaiting task is cancelled."""
 
     def __init__(
-        self, address: str, channel: int = 6, *, socket_factory=rfcomm_socket
+        self,
+        address: str,
+        channel: int = DEFAULT_CHANNEL,
+        *,
+        socket_factory=rfcomm_socket,
     ) -> None:
-        self.address = address
-        self.channel = channel
+        self.address = normalize_address(address)
+        self.channel = validate_channel(channel)
         self._socket_factory = socket_factory
         self._sequence = secrets.randbelow(256)
         self._operation_lock = threading.Lock()

@@ -12,6 +12,12 @@ if not (root / "custom_components" / "redmi_buds").is_dir():
     root = Path("/config")
 sys.path.insert(0, str(root))
 from custom_components.redmi_buds.mma import BudsClient, BudsError  # noqa: E402
+from custom_components.redmi_buds.mma.connection import (  # noqa: E402
+    DEFAULT_CHANNEL,
+    RFCOMM_CHANNELS,
+    InvalidAddress,
+    InvalidChannel,
+)
 from custom_components.redmi_buds.mma.model import (  # noqa: E402
     ACTIONS,
     EQ_PROFILES,
@@ -24,9 +30,14 @@ def main():
     parser.add_argument(
         "address", help="Bluetooth MAC of already paired Redmi Buds 6 Play"
     )
-    parser.add_argument("--channel", type=int, default=6, choices=range(1, 31))
+    parser.add_argument(
+        "--channel", type=int, default=DEFAULT_CHANNEL, choices=RFCOMM_CHANNELS
+    )
     args = parser.parse_args()
-    client = BudsClient(args.address, args.channel)
+    try:
+        client = BudsClient(args.address, args.channel)
+    except (InvalidAddress, InvalidChannel) as err:
+        parser.error(str(err))
     started = time.monotonic()
     try:
         data = client.read()
